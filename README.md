@@ -1,2 +1,2 @@
-# Pr-ctica-de-curs---Aplicacions-M-bils
+# Pràctica de Curs Aplicacions Mòbils
 Triple Triad
