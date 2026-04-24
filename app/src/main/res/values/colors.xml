@@ -1,14 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <!-- Base -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="window_background">#0A0E1A</color>
+    <!-- Triple Triad Palette -->
+    <color name="tt_bg_deep">#070B14</color>
+    <color name="tt_bg_surface">#0D1526</color>
+    <color name="tt_bg_card">#111C35</color>
 
+    <color name="tt_blue_primary">#1A6FD4</color>
+    <color name="tt_blue_light">#4D9FFF</color>
+    <color name="tt_blue_glow">#1A6FD430</color>
+
+    <color name="tt_gold">#C8963E</color>
+    <color name="tt_gold_light">#F0C060</color>
+    <color name="tt_gold_glow">#C8963E40</color>
+
+    <color name="tt_player_blue">#1A6FD4</color>
+    <color name="tt_opponent_red">#C0392B</color>
+    <color name="tt_neutral">#7F8C8D</color>
+
+    <color name="tt_text_primary">#EEF2FF</color>
+    <color name="tt_text_secondary">#8899BB</color>
+    <color name="tt_text_dim">#445577</color>
+
+    <color name="tt_border">#1E2D4D</color>
+    <color name="tt_divider">#162240</color>
+
+    <color name="window_background">#070B14</color>
 </resources>
