@@ -1,5 +1,6 @@
 package com.example.tripletriad
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,9 +12,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tripletriad.ui.theme.TripleTriadTheme
@@ -23,16 +26,35 @@ class GameActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Recuperamos los datos del Intent
-        val alias = intent.getStringExtra("EXTRA_ALIAS") ?: "Player"
+        val playerName = intent.getStringExtra("EXTRA_ALIAS") ?: "Player 1"
+        val gridSize = intent.getIntExtra("EXTRA_SIZE", 3)
         val isTimeEnabled = intent.getBooleanExtra("EXTRA_TIME_CONTROL", false)
 
         setContent {
             TripleTriadTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    // Conectamos el ViewModel
-                    val gameViewModel: GameViewModel = viewModel()
+                // Instanciamos el ViewModel
+                val gameViewModel: GameViewModel = viewModel()
 
-                    GameScreen(alias, isTimeEnabled, gameViewModel)
+                // --- ¡AQUÍ ESTÁ LO NUEVO! ---
+                // Esto "vigila" si isGameOver cambia a true
+                LaunchedEffect(gameViewModel.isGameOver) {
+                    if (gameViewModel.isGameOver) {
+                        // Navegamos a la pantalla de resultados
+                        val intent = Intent(this@GameActivity, ResultsActivity::class.java).apply {
+                            putExtra("EXTRA_NAME", playerName)
+                            putExtra("EXTRA_P1_SCORE", gameViewModel.playerScore)
+                            putExtra("EXTRA_OPP_SCORE", gameViewModel.opponentScore)
+                        }
+                        startActivity(intent)
+                        finish() // Cerramos GameActivity para no volver atrás
+                    }
+                }
+
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    GameScreen(playerName, gridSize, isTimeEnabled, gameViewModel)
                 }
             }
         }
@@ -40,19 +62,24 @@ class GameActivity : ComponentActivity() {
 }
 
 @Composable
-fun GameScreen(alias: String, isTimeEnabled: Boolean, viewModel: GameViewModel) {
+fun GameScreen(playerName: String, gridSize : Int, isTimeEnabled: Boolean, viewModel: GameViewModel) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Información de la partida
-        Text(text = "Player: $alias", style = MaterialTheme.typography.headlineSmall)
-        Text(text = if (viewModel.isPlayer1Turn) "Your Turn" else "Opponent's Turn")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Text("You: ${viewModel.playerScore}", color = Color.Blue, fontWeight = FontWeight.Bold)
+            Text("Turn: ${if (viewModel.isPlayer1Turn) "Yours" else "Opponent's"}")
+            Text("Opponent: ${viewModel.opponentScore}", color = Color.Red, fontWeight = FontWeight.Bold)
+        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        // TABLERO 3x3 (Parrilla)
-        // Usamos LazyVerticalGrid para crear la cuadrícula del tablero
+        // TABLERO 3x3
         Box(modifier = Modifier.size(300.dp).border(2.dp, Color.Black)) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3), // 3 columnas para el 3x3
@@ -72,13 +99,13 @@ fun GameScreen(alias: String, isTimeEnabled: Boolean, viewModel: GameViewModel) 
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         // MOSTRAR LA MANO DEL JUGADOR
         Text(text = "Your Hand", style = MaterialTheme.typography.titleMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             viewModel.playerHand.forEach { card ->
-                CardView(card)
+                CardView(card, Color(0xFFFF0000))
             }
         }
     }
@@ -95,24 +122,38 @@ fun BoardCell(card: Card?, onClick: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         if (card != null) {
-            CardView(card)
+            // Si la carta es nuestra Verde i si es enemiga Roja
+            val cellColor = when (card?.owner) {
+                Player.PLAYER_1 -> MaterialTheme.colorScheme.primary   // Esto ahora será VERDE
+                Player.OPPONENT -> MaterialTheme.colorScheme.secondary // Esto ahora será ROJO
+                else -> Color.LightGray
+            }
+            CardView(card, cellColor)
         }
     }
 }
 
 @Composable
-fun CardView(card: Card) {
+fun CardView(card: Card, backgroundColor: Color) {
     // Una representación simple de la carta con sus 4 números
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(4.dp)
+    Box(
+        modifier = Modifier
+            .padding(4.dp)
+            .size(60.dp, 80.dp)
+            .background(backgroundColor)
+            .border(1.dp, Color.Black),
+        contentAlignment = Alignment.Center
     ) {
-        Text(text = card.top.toString(), style = MaterialTheme.typography.labelSmall)
-        Row {
-            Text(text = card.left.toString(), style = MaterialTheme.typography.labelSmall)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = card.right.toString(), style = MaterialTheme.typography.labelSmall)
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = card.top.toString(), fontWeight = FontWeight.Bold)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = " "+card.left.toString(), fontWeight = FontWeight.Bold)
+                Text(text = card.right.toString()+" ", fontWeight = FontWeight.Bold)
+            }
+            Text(text = card.bottom.toString(), fontWeight = FontWeight.Bold)
         }
-        Text(text = card.bottom.toString(), style = MaterialTheme.typography.labelSmall)
     }
 }
