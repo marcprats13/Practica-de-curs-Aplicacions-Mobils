@@ -37,7 +37,7 @@
 
     <!-- Card legend -->
     <string name="card_legend_top">▲ Superior</string>
-    <string name="card_legend_left">◀ Esquerre</string>
-    <string name="card_legend_right">▶ Dret</string>
+    <string name="card_legend_left">◀ Izquierda</string>
+    <string name="card_legend_right">▶ Derecha</string>
     <string name="card_legend_bottom">▼ Inferior</string>
 </resources>
