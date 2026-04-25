@@ -40,4 +40,41 @@
     <string name="card_legend_left">◀ Izquierda</string>
     <string name="card_legend_right">▶ Derecha</string>
     <string name="card_legend_bottom">▼ Inferior</string>
+
+    <!-- Game Screen -->
+    <string name="game_your_hand">LA TEVA MÀ</string>
+    <string name="game_turn_yours">EL TEU TORN</string>
+    <string name="game_turn_opponent">TORN DEL RIVAL</string>
+
+    <!-- End Game Dialog -->
+    <string name="dialog_win_title">VICTORIA</string>
+    <string name="dialog_lose_title">DERROTA</string>
+    <string name="dialog_draw_title">EMPATE</string>
+    <string name="dialog_win_sub">Has dominado el tablero</string>
+    <string name="dialog_lose_sub">El rival te ha superado</string>
+    <string name="dialog_draw_sub">Igual de fuerza de los dos bandos</string>
+    <string name="dialog_btn_results">VER RESULTADOS</string>
+    <string name="dialog_score_format">%1$d — %2$d</string>
+
+    <!-- Results Screen -->
+    <string name="results_title">RESULTADOS</string>
+    <string name="results_subtitle">FIN DE PARTIDA</string>
+    <string name="results_player_label">JUGADOR</string>
+    <string name="results_machine_label">MAQUINA</string>
+    <string name="results_win">VICTORIA</string>
+    <string name="results_lose">DERROTA</string>
+    <string name="results_draw">EMPATE</string>
+    <string name="results_stats_title">ESTADISTICAS</string>
+    <string name="results_stat_size">Tamaño del Tablero</string>
+    <string name="results_stat_time">Tiempo de partida</string>
+    <string name="results_stat_date">Data</string>
+    <string name="results_stat_seconds">%1$d segons</string>
+    <string name="results_stat_grid">%1$dx%1$d</string>
+    <string name="results_log_title">LOG DE PARTIDA</string>
+    <string name="results_email_label">Email destinatario</string>
+    <string name="results_subject_label">Contexto</string>
+    <string name="results_btn_send">MANDAR LOG POR EMAIL</string>
+    <string name="results_btn_play_again">NUEVA PARTIDA</string>
+    <string name="results_btn_exit">SALIR</string>
+    <string name="results_chooser">Enviar Log…</string>
 </resources>
