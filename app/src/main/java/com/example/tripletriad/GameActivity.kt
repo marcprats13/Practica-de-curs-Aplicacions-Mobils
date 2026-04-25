@@ -35,15 +35,23 @@ class GameActivity : ComponentActivity() {
                 // Instanciamos el ViewModel
                 val gameViewModel: GameViewModel = viewModel()
 
-                // --- ¡AQUÍ ESTÁ LO NUEVO! ---
-                // Esto "vigila" si isGameOver cambia a true
+                // Timer
+                LaunchedEffect(Unit) {
+                    if (isTimeEnabled) {
+                        gameViewModel.startTimer(25) // Le pasamos 25 segundos
+                    }
+                }
+
                 LaunchedEffect(gameViewModel.isGameOver) {
                     if (gameViewModel.isGameOver) {
+                        val timeSpent = 25 - gameViewModel.timeLeft // Cuánto ha tardado
                         // Navegamos a la pantalla de resultados
                         val intent = Intent(this@GameActivity, ResultsActivity::class.java).apply {
                             putExtra("EXTRA_NAME", playerName)
+                            putExtra("EXTRA_SIZE", gridSize)
                             putExtra("EXTRA_P1_SCORE", gameViewModel.playerScore)
                             putExtra("EXTRA_OPP_SCORE", gameViewModel.opponentScore)
+                            putExtra("EXTRA_TIME", timeSpent)
                         }
                         startActivity(intent)
                         finish() // Cerramos GameActivity para no volver atrás
@@ -67,7 +75,20 @@ fun GameScreen(playerName: String, gridSize : Int, isTimeEnabled: Boolean, viewM
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Información de la partida
+        // Temporizador
+        Text(text = "$playerName's Game", style = MaterialTheme.typography.titleLarge)
+
+        if (isTimeEnabled) {
+            Text(
+                text = "Tiempo Restante: ${viewModel.timeLeft} s",
+                style = MaterialTheme.typography.bodyLarge,
+                // Si quedan 5s o menos, se pone en rojo
+                color = if (viewModel.timeLeft <= 5) Color.Red else Color.Gray
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Marcadores de la partida
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -89,10 +110,7 @@ fun GameScreen(playerName: String, gridSize : Int, isTimeEnabled: Boolean, viewM
                     BoardCell(
                         card = viewModel.board[index],
                         onClick = {
-                            // Por ahora, si tenemos cartas en la mano, jugamos la primera
-                            if (viewModel.playerHand.isNotEmpty()) {
-                                viewModel.playCard(index, viewModel.playerHand[0])
-                            }
+                            viewModel.playCard(index)
                         }
                     )
                 }
@@ -103,9 +121,23 @@ fun GameScreen(playerName: String, gridSize : Int, isTimeEnabled: Boolean, viewM
 
         // MOSTRAR LA MANO DEL JUGADOR
         Text(text = "Your Hand", style = MaterialTheme.typography.titleMedium)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(top = 8.dp)
+        ) {
             viewModel.playerHand.forEach { card ->
-                CardView(card, Color(0xFFFF0000))
+                val isSelected = card == viewModel.selectedCard
+
+                Box(
+                    modifier = Modifier
+                        .clickable { viewModel.selectCard(card) } // Le avisamos al ViewModel que la hemos tocado
+                        .border(
+                            width = if (isSelected) 3.dp else 0.dp,
+                            color = if (isSelected) Color.Yellow else Color.Transparent
+                        )
+                ) {
+                    CardView(card, MaterialTheme.colorScheme.primary)
+                }
             }
         }
     }
