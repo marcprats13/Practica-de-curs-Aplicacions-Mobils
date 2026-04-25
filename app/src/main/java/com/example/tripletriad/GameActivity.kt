@@ -10,6 +10,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,23 +40,7 @@ class GameActivity : ComponentActivity() {
                 // Timer
                 LaunchedEffect(Unit) {
                     if (isTimeEnabled) {
-                        gameViewModel.startTimer(25) // Le pasamos 25 segundos
-                    }
-                }
-
-                LaunchedEffect(gameViewModel.isGameOver) {
-                    if (gameViewModel.isGameOver) {
-                        val timeSpent = 25 - gameViewModel.timeLeft // Cuánto ha tardado
-                        // Navegamos a la pantalla de resultados
-                        val intent = Intent(this@GameActivity, ResultsActivity::class.java).apply {
-                            putExtra("EXTRA_NAME", playerName)
-                            putExtra("EXTRA_SIZE", gridSize)
-                            putExtra("EXTRA_P1_SCORE", gameViewModel.playerScore)
-                            putExtra("EXTRA_OPP_SCORE", gameViewModel.opponentScore)
-                            putExtra("EXTRA_TIME", timeSpent)
-                        }
-                        startActivity(intent)
-                        finish() // Cerramos GameActivity para no volver atrás
+                        gameViewModel.startTimer(50)
                     }
                 }
 
@@ -62,7 +48,59 @@ class GameActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    // 1. Dibujamos la pantalla normal del juego
                     GameScreen(playerName, gridSize, isTimeEnabled, gameViewModel)
+
+                    // 2. LA ALERTA DE FIN DE JUEGO (Pop-up)
+                    if (gameViewModel.isGameOver) {
+                        val timeSpent = if (isTimeEnabled) 25 - gameViewModel.timeLeft else 0
+
+                        // Calculamos el texto de victoria/derrota para el pop-up
+                        val resultMessage = when {
+                            gameViewModel.playerScore > gameViewModel.opponentScore -> "¡VICTORIA!"
+                            gameViewModel.playerScore < gameViewModel.opponentScore -> "¡DERROTA!"
+                            else -> "¡EMPATE!"
+                        }
+
+                        AlertDialog(
+                            onDismissRequest = { /* Lo dejamos vacío para obligar al jugador a pulsar el botón */ },
+                            title = {
+                                Text(
+                                    text = "Partida Finalizada",
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            text = {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = resultMessage,
+                                        style = MaterialTheme.typography.headlineMedium
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(text = "Tú: ${gameViewModel.playerScore} - Máquina: ${gameViewModel.opponentScore}")
+                                }
+                            },
+                            confirmButton = {
+                                Button(onClick = {
+                                    // AQUÍ ESTÁ EL SALTO A RESULTADOS
+                                    val intent = Intent(
+                                        this@GameActivity,
+                                        ResultsActivity::class.java
+                                    ).apply {
+                                        putExtra("EXTRA_NAME", playerName)
+                                        putExtra("EXTRA_SIZE", gridSize)
+                                        putExtra("EXTRA_P1_SCORE", gameViewModel.playerScore)
+                                        putExtra("EXTRA_OPP_SCORE", gameViewModel.opponentScore)
+                                        putExtra("EXTRA_TIME", timeSpent)
+                                    }
+                                    startActivity(intent)
+                                    finish() // Cerramos GameActivity
+                                }) {
+                                    Text("Ver Resultados y Enviar")
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -72,7 +110,10 @@ class GameActivity : ComponentActivity() {
 @Composable
 fun GameScreen(playerName: String, gridSize : Int, isTimeEnabled: Boolean, viewModel: GameViewModel) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()), // <--- ¡AQUÍ ESTÁ LA MAGIA!
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Temporizador
