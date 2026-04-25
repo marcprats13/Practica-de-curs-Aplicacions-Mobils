@@ -1,5 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TripleTriad</string>
     <string name="title_activity_game">GameActivity</string>
     <string name="title_activity_results">ResultsActivity</string>
+
+    <!-- Main Menu -->
+    <string name="menu_new_game">NUEVA PARTIDA</string>
+    <string name="menu_help">AYUDA</string>
+    <string name="menu_exit">SALIR</string>
+    <string name="menu_title_top">TRIPLE</string>
+    <string name="menu_title_bottom">TRIAD</string>
+
+    <!-- Help Screen -->
+    <string name="help_back">◀  VOLVER</string>
+    <string name="help_title">AYUDA</string>
+    <string name="help_subtitle">TRIPLE TRIAD</string>
+    <string name="help_card_anatomy">ANATOMIA DE LA CARTA</string>
+    <string name="help_label_player">JUGADOR</string>
+    <string name="help_label_opponent">RIVAL</string>
+
+    <string name="help_section1_icon">⊞</string>
+    <string name="help_section1_title">EL TABLERO</string>
+    <string name="help_section1_body">El juego se desarrolla en un tablero de 3×3 casillas. Los dos jugadores comienzan con 5 cartas cada uno. El tablero se llena completamente al final de la partida.</string>
+
+    <string name="help_section2_icon">◈</string>
+    <string name="help_section2_title">LAS CARTAS</string>
+    <string name="help_section2_body">Cada carta tiene 4 valores numéricos (1–9) en los lados: Superior, Inferior, Izquierdo y Derecho. El valor indica la fuerza de ese lado en combate.</string>
+
+    <string name="help_section3_icon">⚔</string>
+    <string name="help_section3_title">CAPTURAS</string>
+    <string name="help_section3_body">Al colocar una carta, se compara con las cartas adyacentes del rival. Si tu valor es MAYOR que el del lado opuesto del rival, capturas su carta y cambia a tu color.</string>
+
+    <string name="help_section4_icon">◆</string>
+    <string name="help_section4_title">VICTORIA</string>
+    <string name="help_section4_body">Cuando el tablero se llena, gana el jugador con más cartas de su color. Se cuentan todas las cartas en el tablero, sean originales o capturadas.</string>
+
+    <!-- Card legend -->
+    <string name="card_legend_top">▲ Superior</string>
+    <string name="card_legend_left">◀ Esquerre</string>
+    <string name="card_legend_right">▶ Dret</string>
+    <string name="card_legend_bottom">▼ Inferior</string>
 </resources>
