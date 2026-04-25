@@ -139,14 +139,6 @@ fun MainMenuScreen(
 
                     Spacer(Modifier.height(8.dp))
 
-                    Text(
-                        text = "FINAL FANTASY VIII",
-                        fontSize = 11.sp,
-                        letterSpacing = 4.sp,
-                        color = TextSecondary,
-                        fontWeight = FontWeight.Medium
-                    )
-
                     Spacer(Modifier.height(24.dp))
                     HorizontalDividerWithDiamonds()
                 }

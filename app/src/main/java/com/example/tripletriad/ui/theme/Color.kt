@@ -11,12 +11,12 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 // --- PLAYER COLORS (GREEN) ---
-val PlayerGreenLight = Color(0xFFC8E6C9)
+val PlayerGreenLight = Color(0xFF76FD8B)
 val PlayerGreenDark = Color(0xFF2E7D32)
 
 // --- OPPONENT COLORS (RED) ---
-val OpponentRedLight = Color(0xFFFFCDD2)
-val OpponentRedDark = Color(0xFFC62828)
+val OpponentRedLight = Color(0xFFFA0720)
+val OpponentRedDark = Color(0xFF9D0606)
 
 // --- SYSTEM COLORS ---
 val BoardBackground = Color(0xFFE0E0E0)

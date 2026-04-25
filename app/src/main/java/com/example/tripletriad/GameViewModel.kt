@@ -1,47 +1,78 @@
 package com.example.tripletriad
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class GameViewModel : ViewModel() {
 
-    // 1. EL TABLERO (The Board): Una lista de 9 posiciones (3x3).
-    // Usamos 'null' para representar una casilla vacía.
+    // Tablero
     val board = mutableStateListOf<Card?>().apply {
         repeat(9) { add(null) }
     }
 
-    // 2. ESTADO DEL JUEGO (Game State)
-    var isPlayer1Turn by mutableStateOf(true) // true = tu turno, false = turno oponente
-    var playerScore by mutableStateOf(5) // En Triple Triad empiezas con 5 cartas
-    var opponentScore by mutableStateOf(5)
+    // Game State
+    var isPlayer1Turn by mutableStateOf(Random.nextBoolean())
+
+    init {
+        // Si la máquina gana el sorteo inicial, empieza ella
+        if (!isPlayer1Turn) {
+            viewModelScope.launch {
+                delay(1000) // Pausa de "pensamiento" antes de su primera carta
+                playOpponentTurn()
+            }
+        }
+    }
+    var playerScore by mutableIntStateOf(5) // Empezamos con 5 cartas
+    var opponentScore by mutableIntStateOf(5)
 
     var isGameOver by mutableStateOf(false)
         private set
 
-    // 3. LA MANO DEL JUGADOR (Player's Hand)
-    // Para probar, generaremos 5 cartas aleatorias sencillas
+    var selectedCard by mutableStateOf<Card?>(null)
+        private set
+    var timeLeft by mutableIntStateOf(25) // Por defecto 25, pero lo cambiaremos
+        private set
+
+    // Objeto clásico de Android para contar hacia atrás
+    private var timerJob: Job? = null
+
+
+    // Player's Hand
     val playerHand = mutableStateListOf<Card>().apply {
         repeat(5) {
             add(Card((1..9).random(), (1..9).random(), (1..9).random(), (1..9).random(), Player.PLAYER_1))
         }
     }
-
+    // Opponent's Hand
     val opponentHand = mutableStateListOf<Card>().apply {
         repeat(5) {
             add(Card((1..9).random(), (1..9).random(), (1..9).random(), (1..9).random(), Player.OPPONENT))
         }
     }
 
+    fun selectCard(card: Card) {
+        if (isPlayer1Turn && !isGameOver) {
+            selectedCard = card
+        }
+    }
+
     // Método para jugar una carta en el tablero
-    fun playCard(boardIndex: Int, card: Card) {
-        // Solo te dejamos jugar si la casilla está vacía y es tu turno
-        if (board[boardIndex] == null && isPlayer1Turn) {
-            board[boardIndex] = card.copy()
-            playerHand.remove(card)
+    fun playCard(boardIndex: Int) {
+        val cardToPlay = selectedCard
+
+        if (timeLeft > 0 && cardToPlay != null && board[boardIndex] == null && isPlayer1Turn && !isGameOver) {
+            board[boardIndex] = cardToPlay.copy()
+            playerHand.remove(cardToPlay)
+            selectedCard = null
 
             checkCaptures(boardIndex)
             updateScores()
@@ -50,7 +81,15 @@ class GameViewModel : ViewModel() {
             if (!isGameOver) {
                 // Pasamos el turno y hacemos que la máquina juegue
                 isPlayer1Turn = false
-                playOpponentTurn()
+
+                viewModelScope.launch {
+                    delay(1000) // Espera 0.8 segundos para que el usuario vea su jugada
+
+                    // Si el juego no ha terminado por tiempo en este medio segundo, la máquina juega
+                    if (!isGameOver) {
+                        playOpponentTurn()
+                    }
+                }
             }
         }
     }
@@ -130,13 +169,36 @@ class GameViewModel : ViewModel() {
             }
         }
         // Sumamos las cartas que aún quedan en las manos
-        playerScore = p1 + playerHand.size
-        opponentScore = opp + opponentHand.size // (Simulación del rival)
+        playerScore = p1
+        opponentScore = opp
+    }
+
+    fun startTimer(maxTimeSeconds: Int) {
+        if (timerJob == null) { // Evita que se arranque dos veces al rotar la pantalla
+            timeLeft = maxTimeSeconds
+
+            timerJob = viewModelScope.launch { //
+                while (timeLeft > 0 && !isGameOver) {
+                    delay(1000L) // Espera un segundo
+                    timeLeft--
+
+                    // RÚBRICA: "Control de si tiempo agotado"
+                    if (timeLeft <= 0) {
+                        isGameOver = true
+                    }
+                }
+            }
+        }
+    }
+
+    fun stopTimer() {
+        timerJob?.cancel()
     }
     fun checkGameOver() {
         // El juego termina si no quedan huecos en el tablero
         if (board.all { it != null }) {
             isGameOver = true
+            stopTimer()
         }
     }
 }
