@@ -63,38 +63,32 @@ data class HelpSection(
 private val helpSections = listOf(
     HelpSection(
         icon = "⊞",
-        title = "EL TAULER",
-        body = "El joc es desenvolupa en un tauler de 3×3 caselles. " +
-                "Els dos jugadors comencen amb 5 cartes cadascun. " +
-                "El tauler s'omple completament al final de la partida."
+        title = "EL TABLERO",
+        body = "El juego se desenvolupa en un tablero de 3×3 casillas. " +
+                "Los dos jugadores empiezan con 5 cartas cada uno. " +
+                "El tablero se llena completamente al final de la partida."
     ),
     HelpSection(
         icon = "◈",
-        title = "LES CARTES",
-        body = "Cada carta té 4 valors numèrics (1–9) als costats: " +
-                "Superior, Inferior, Esquerre i Dret. " +
-                "El valor indica la força d'aquell costat en combat."
+        title = "LAS CARTAS",
+        body = "Cada carta tien 4 valores numèricos (1–9) a los lados: " +
+                "Superior, Inferior, Izquierda i Derecha. " +
+                "El valor indica la fuerza de ese lado en combate."
     ),
     HelpSection(
         icon = "⚔",
-        title = "CAPTURES",
-        body = "En col·locar una carta, es compara amb les cartes adjacents del rival. " +
-                "Si el teu valor és MAJOR que el del costat oposat del rival, captures la seva carta " +
-                "i canvia al teu color."
+        title = "CAPTURAS",
+        body = "Al colocar una carta, se compara con las cartas adyacentes del rival. " +
+                "Si tu valor es MAYOR que el del lado opuesto del rival, capturas su carta " +
+                "y cambia a tu color."
     ),
     HelpSection(
         icon = "◆",
-        title = "VICTÒRIA",
-        body = "Quan el tauler s'omple, guanya el jugador amb més cartes del seu color. " +
-                "Es compten totes les cartes al tauler, siguin originals o capturades."
+        title = "VICTORIA",
+        body = "Cuando el tablero se llena, gana el jugador con más cartas de su color. " +
+                "Se cuentan todas las cartas en el tablero, sean originales o capturadas."
     ),
-    HelpSection(
-        icon = "★",
-        title = "CONSELLS",
-        body = "• Col·loca les cartes als cantons per exposar menys costats.\n" +
-                "• Les cartes amb valors alts en múltiples costats són les més versàtils.\n" +
-                "• Intenta anticipar les jugades del rival per protegir les teves cartes."
-    )
+
 )
 
 // ─── Help Screen ──────────────────────────────────────────────────────────────
@@ -179,7 +173,7 @@ fun HelpHeader(onBack: () -> Unit) {
                 )
                 .padding(horizontal = 14.dp, vertical = 10.dp)
         ) {
-            Text("◀  TORNAR", color = TextSecondary, fontSize = 11.sp, letterSpacing = 2.sp)
+            Text("◀  VOLVER", color = TextSecondary, fontSize = 11.sp, letterSpacing = 2.sp)
         }
 
         // Títol centrat
@@ -188,7 +182,7 @@ fun HelpHeader(onBack: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "AJUDA",
+                text = "AYUDA",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 6.sp,
@@ -219,7 +213,7 @@ fun CardDemoSection() {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "ANATOMIA D'UNA CARTA",
+            text = "ANATOMIA DE LA CARTA",
             fontSize = 10.sp,
             letterSpacing = 3.sp,
             color = GoldColor,

@@ -139,16 +139,6 @@ fun MainMenuScreen(
 
                     Spacer(Modifier.height(8.dp))
 
-                    Text(
-                        text = "FINAL FANTASY VIII",
-                        fontSize = 11.sp,
-                        letterSpacing = 4.sp,
-                        color = TextSecondary,
-                        fontWeight = FontWeight.Medium
-                    )
-
-                    Spacer(Modifier.height(24.dp))
-                    HorizontalDividerWithDiamonds()
                 }
             }
 
@@ -166,19 +156,19 @@ fun MainMenuScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     MenuButton(
-                        label = "NOVA PARTIDA",
+                        label = "NUEVA PARTIDA",
                         icon = "▶",
                         isPrimary = true,
                         onClick = onStartGame
                     )
                     MenuButton(
-                        label = "AJUDA",
+                        label = "AYUDA",
                         icon = "?",
                         isPrimary = false,
                         onClick = onHelp
                     )
                     MenuButton(
-                        label = "SORTIR",
+                        label = "SALIR",
                         icon = "✕",
                         isPrimary = false,
                         onClick = onExit
