@@ -1,4 +1,4 @@
-package com.example.tripletriad
+package com.example.tripletriad.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -7,6 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tripletriad.model.Card
+import com.example.tripletriad.utils.GameSettings
+import com.example.tripletriad.model.Player
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -22,7 +25,7 @@ class GameViewModel : ViewModel() {
     val gameStartTime = System.currentTimeMillis()
 
     // Game State
-    var isPlayer1Turn by mutableStateOf(Random.nextBoolean())
+    var isPlayer1Turn by mutableStateOf(Random.Default.nextBoolean())
 
     init {
         // Si la máquina gana el sorteo inicial, empieza ella
@@ -53,13 +56,29 @@ class GameViewModel : ViewModel() {
     // Player's Hand
     val playerHand = mutableStateListOf<Card>().apply {
         repeat(5) {
-            add(Card((1..9).random(), (1..9).random(), (1..9).random(), (1..9).random(), Player.PLAYER_1))
+            add(
+                Card(
+                    (1..9).random(),
+                    (1..9).random(),
+                    (1..9).random(),
+                    (1..9).random(),
+                    Player.PLAYER_1
+                )
+            )
         }
     }
     // Opponent's Hand
     val opponentHand = mutableStateListOf<Card>().apply {
         repeat(5) {
-            add(Card((1..9).random(), (1..9).random(), (1..9).random(), (1..9).random(), Player.OPPONENT))
+            add(
+                Card(
+                    (1..9).random(),
+                    (1..9).random(),
+                    (1..9).random(),
+                    (1..9).random(),
+                    Player.OPPONENT
+                )
+            )
         }
     }
 
@@ -121,7 +140,7 @@ class GameViewModel : ViewModel() {
                         maxCaptures = simulatedCaptures
                         bestCard = card
                         bestIndex = index
-                    } else if (simulatedCaptures == maxCaptures && Random.nextBoolean()) {
+                    } else if (simulatedCaptures == maxCaptures && Random.Default.nextBoolean()) {
                         // Si empata (ambas capturan 0), aplicamos un poco de azar
                         bestCard = card
                         bestIndex = index

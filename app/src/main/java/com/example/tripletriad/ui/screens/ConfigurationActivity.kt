@@ -1,4 +1,4 @@
-package com.example.tripletriad
+package com.example.tripletriad.ui.screens
 
 import android.content.Intent
 import android.os.Bundle
@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.tripletriad.utils.IntentKeys
 import com.example.tripletriad.ui.theme.TripleTriadTheme
 
 class ConfigurationActivity : ComponentActivity() {

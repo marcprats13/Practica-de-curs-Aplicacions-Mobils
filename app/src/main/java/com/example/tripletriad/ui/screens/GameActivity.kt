@@ -1,10 +1,9 @@
-package com.example.tripletriad
+package com.example.tripletriad.ui.screens
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -25,6 +24,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tripletriad.model.Card
+import com.example.tripletriad.utils.GameSettings
+import com.example.tripletriad.viewmodel.GameViewModel
+import com.example.tripletriad.utils.IntentKeys
+import com.example.tripletriad.model.Player
+import com.example.tripletriad.R
 import com.example.tripletriad.ui.theme.*
 import kotlinx.coroutines.delay
 

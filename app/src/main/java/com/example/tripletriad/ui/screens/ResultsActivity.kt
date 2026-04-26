@@ -1,4 +1,4 @@
-package com.example.tripletriad
+package com.example.tripletriad.ui.screens
 
 import android.content.Intent
 import android.os.Bundle
@@ -24,9 +24,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tripletriad.utils.EmailConfig
+import com.example.tripletriad.utils.GameSettings
+import com.example.tripletriad.utils.IntentKeys
+import com.example.tripletriad.R
 import com.example.tripletriad.ui.theme.*
+import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import com.example.tripletriad.viewmodel.ResultsViewModel
 
 class ResultsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +65,13 @@ class ResultsActivity : ComponentActivity() {
         setContent {
             TripleTriadTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = TtBgDeep) {
+
+                    val viewModel: ResultsViewModel = viewModel()
+
+                    LaunchedEffect(Unit) {
+                        viewModel.initData(subject = now, log = logResumen)
+                    }
+
                     ResultsScreen(
                         playerName  = alias,
                         gridSize    = size,
@@ -65,7 +79,7 @@ class ResultsActivity : ComponentActivity() {
                         p1Score     = p1,
                         oppScore    = opp,
                         dateTime    = now,
-                        initialLog  = logResumen,
+                        viewModel   = viewModel,
                         onSend = { email, subject, body ->
                             val intentEmail = Intent(Intent.ACTION_SEND).apply {
                                 type = EmailConfig.MIME_TYPE
@@ -97,14 +111,11 @@ fun ResultsScreen(
     p1Score: Int,
     oppScore: Int,
     dateTime: String,
-    initialLog: String,
+    viewModel: ResultsViewModel,
     onSend: (String, String, String) -> Unit,
     onPlayAgain: () -> Unit,
     onExit: () -> Unit
 ) {
-    var emailRecipient by remember { mutableStateOf(EmailConfig.DEFAULT_RECIPIENT) }
-    var emailSubject   by remember { mutableStateOf(dateTime) }
-    var logBody        by remember { mutableStateOf(initialLog) }
 
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
@@ -228,9 +239,17 @@ fun ResultsScreen(
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            ScoreChip(label = stringResource(R.string.results_player_label),   score = p1Score,  color = TtPlayerBlue)
+                            ScoreChip(
+                                label = playerName.uppercase(),
+                                score = p1Score,
+                                color = TtPlayerBlue
+                            )
                             Text("—", color = TtTextDim, fontSize = 20.sp, fontWeight = FontWeight.Black)
-                            ScoreChip(label = stringResource(R.string.results_machine_label), score = oppScore, color = TtOpponentRed)
+                            ScoreChip(
+                                label = stringResource(R.string.results_machine_label),
+                                score = oppScore,
+                                color = TtOpponentRed
+                            )
                         }
                     }
                 }
@@ -279,21 +298,21 @@ fun ResultsScreen(
 
                     // Email
                     TtOutlinedField(
-                        value = emailRecipient,
-                        onValueChange = { emailRecipient = it },
+                        value = viewModel.emailRecipient,
+                        onValueChange = { viewModel.emailRecipient = it },
                         label = stringResource(R.string.results_email_label),
                         modifier = Modifier.focusRequester(focusRequester)
                     )
                     // Assumpte
                     TtOutlinedField(
-                        value = emailSubject,
-                        onValueChange = { emailSubject = it },
+                        value = viewModel.emailSubject,
+                        onValueChange = { viewModel.emailSubject = it },
                         label = stringResource(R.string.results_subject_label)
                     )
                     // Log
                     TtOutlinedField(
-                        value = logBody,
-                        onValueChange = { logBody = it },
+                        value = viewModel.logBody,
+                        onValueChange = { viewModel.logBody = it },
                         label = "Log",
                         modifier = Modifier.height(150.dp),
                         singleLine = false
@@ -303,7 +322,7 @@ fun ResultsScreen(
                     TtButton(
                         label = stringResource(R.string.results_btn_send),
                         color = TtGold,
-                        onClick = { onSend(emailRecipient, emailSubject, logBody) }
+                        onClick = { onSend(viewModel.emailRecipient, viewModel.emailSubject, viewModel.logBody) }
                     )
                 }
             }
@@ -359,7 +378,8 @@ fun TtButton(
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         label = "btn_scale"
     )
-    LaunchedEffect(pressed) { if (pressed) { kotlinx.coroutines.delay(150); pressed = false } }
+    LaunchedEffect(pressed) { if (pressed) {
+        delay(150); pressed = false } }
 
     Box(
         modifier = modifier

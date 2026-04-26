@@ -1,4 +1,4 @@
-package com.example.tripletriad
+package com.example.tripletriad.utils
 
 object IntentKeys {
     const val EXTRA_ALIAS = "EXTRA_ALIAS"

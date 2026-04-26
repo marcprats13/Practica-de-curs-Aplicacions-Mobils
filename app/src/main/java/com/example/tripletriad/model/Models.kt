@@ -1,4 +1,4 @@
-package com.example.tripletriad
+package com.example.tripletriad.model
 
 // Enum per saber de qui és la carta
 enum class Player { NONE, PLAYER_1, OPPONENT }

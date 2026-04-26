@@ -1,4 +1,4 @@
-package com.example.tripletriad
+package com.example.tripletriad.ui.screens
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
+import com.example.tripletriad.model.Player
+import com.example.tripletriad.R
 import com.example.tripletriad.ui.theme.*
 import kotlinx.coroutines.delay
 
@@ -42,10 +44,14 @@ data class HelpSection(val icon: String, val title: String, val body: String)
 
 @Composable
 fun helpSections(): List<HelpSection> = listOf(
-    HelpSection(stringResource(R.string.help_section1_icon), stringResource(R.string.help_section1_title), stringResource(R.string.help_section1_body)),
-    HelpSection(stringResource(R.string.help_section2_icon), stringResource(R.string.help_section2_title), stringResource(R.string.help_section2_body)),
-    HelpSection(stringResource(R.string.help_section3_icon), stringResource(R.string.help_section3_title), stringResource(R.string.help_section3_body)),
-    HelpSection(stringResource(R.string.help_section4_icon), stringResource(R.string.help_section4_title), stringResource(R.string.help_section4_body)),
+    HelpSection(stringResource(R.string.help_section1_icon), stringResource(R.string.help_section1_title), stringResource(
+        R.string.help_section1_body)),
+    HelpSection(stringResource(R.string.help_section2_icon), stringResource(R.string.help_section2_title), stringResource(
+        R.string.help_section2_body)),
+    HelpSection(stringResource(R.string.help_section3_icon), stringResource(R.string.help_section3_title), stringResource(
+        R.string.help_section3_body)),
+    HelpSection(stringResource(R.string.help_section4_icon), stringResource(R.string.help_section4_title), stringResource(
+        R.string.help_section4_body)),
 )
 
 @Composable
