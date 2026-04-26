@@ -89,7 +89,7 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 2. Control de Tiempo
+        // Control de Tiempo
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -99,7 +99,7 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
             Switch(checked = isTimeEnabled, onCheckedChange = { isTimeEnabled = it })
         }
 
-        // 3. Modo Fronteras
+        // Modo Fronteras
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -112,7 +112,7 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
             Switch(checked = isBordersMode, onCheckedChange = { isBordersMode = it })
         }
 
-        // 4. Modo Inverso
+        // Modo Inverso
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -127,7 +127,6 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Botón Jugar con Validación
         Button(
             onClick = {
                 if (alias.isNotBlank()) {

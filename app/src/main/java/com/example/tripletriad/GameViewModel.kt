@@ -90,9 +90,8 @@ class GameViewModel : ViewModel() {
                 isPlayer1Turn = false
 
                 viewModelScope.launch {
-                    delay(1000) // Espera 0.8 segundos para que el usuario vea su jugada
+                    delay(1000) // Delay de 1 segundo para que el jugador vea la jugada
 
-                    // Si el juego no ha terminado por tiempo en este medio segundo, la máquina juega
                     if (!isGameOver) {
                         playOpponentTurn()
                     }
@@ -106,15 +105,36 @@ class GameViewModel : ViewModel() {
         val emptyIndices = board.indices.filter { board[it] == null }
 
         if (emptyIndices.isNotEmpty() && opponentHand.isNotEmpty()) {
-            // El oponente elige una casilla al azar y una carta al azar
-            val randomIndex = emptyIndices.random()
-            val randomCard = opponentHand.random()
+            var bestCard: Card? = null
+            var bestIndex = -1
+            var maxCaptures = -1
 
-            // Juega la carta
-            board[randomIndex] = randomCard.copy()
-            opponentHand.remove(randomCard)
+            // Algoritmo Greedy
+            for (card in opponentHand) {
+                for (index in emptyIndices) {
+                    val simulatedCaptures = simulateCaptures(card, index)
 
-            checkCaptures(randomIndex)
+                    // Si esta jugada captura más cartas que la anterior, entonces la guardamos
+                    if (simulatedCaptures > maxCaptures) {
+                        maxCaptures = simulatedCaptures
+                        bestCard = card
+                        bestIndex = index
+                    } else if (simulatedCaptures == maxCaptures && Random.nextBoolean()) {
+                        // Si empata (ambas capturan 0), aplicamos un poco de azar
+                        bestCard = card
+                        bestIndex = index
+                    }
+                }
+            }
+
+            //Si algo falla, entonces tiramos de random por si acaso
+            val finalIndex = if (bestIndex != -1) bestIndex else emptyIndices.random()
+            val finalCard = bestCard ?: opponentHand.random()
+
+            board[finalIndex] = finalCard.copy()
+            opponentHand.remove(finalCard)
+
+            checkCaptures(finalIndex)
             updateScores()
             checkGameOver()
 
@@ -173,6 +193,52 @@ class GameViewModel : ViewModel() {
                 }
             }
         }
+    }
+
+    // Función auxiliar para el algoritmo del greedy para la IA
+    private fun simulateCaptures(card: Card, index: Int): Int {
+        var captures = 0
+
+        val topNeighbor = if (isBordersMode && index < 3) index + 6 else index - 3
+        val bottomNeighbor = if (isBordersMode && index > 5) index - 6 else index + 3
+        val leftNeighbor = if (isBordersMode && index % 3 == 0) index + 2 else index - 1
+        val rightNeighbor = if (isBordersMode && index % 3 == 2) index - 2 else index + 1
+
+        val neighbors = listOf(
+            Triple(topNeighbor, "TOP", "BOTTOM"),
+            Triple(bottomNeighbor, "BOTTOM", "TOP"),
+            Triple(leftNeighbor, "LEFT", "RIGHT"),
+            Triple(rightNeighbor, "RIGHT", "LEFT")
+        )
+
+        for ((neighborIndex, position, _) in neighbors) {
+            if (neighborIndex in 0..8) {
+
+                if (!isBordersMode) {
+                    if (position == "LEFT" && index % 3 == 0) continue
+                    if (position == "RIGHT" && index % 3 == 2) continue
+                }
+
+                val neighborCard = board[neighborIndex]
+                if (neighborCard != null && neighborCard.owner == Player.PLAYER_1) {
+
+                    fun wins(myStat: Int, oppStat: Int): Boolean {
+                        return if (isReverseMode) myStat < oppStat else myStat > oppStat
+                    }
+
+                    val shouldCapture = when (position) {
+                        "TOP" -> wins(card.top, neighborCard.bottom)
+                        "BOTTOM" -> wins(card.bottom, neighborCard.top)
+                        "LEFT" -> wins(card.left, neighborCard.right)
+                        "RIGHT" -> wins(card.right, neighborCard.left)
+                        else -> false
+                    }
+
+                    if (shouldCapture) captures++
+                }
+            }
+        }
+        return captures
     }
 
     private fun updateScores() {
