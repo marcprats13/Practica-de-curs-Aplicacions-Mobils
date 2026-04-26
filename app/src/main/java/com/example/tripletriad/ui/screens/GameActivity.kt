@@ -248,7 +248,7 @@ fun ScoreChip(label: String, score: Int, color: Color) {
     }
 }
 
-// ─── Game Screen ──────────────────────────────────────────────────────────────
+// Game Screen
 @Composable
 fun GameScreen(
     playerName: String,
