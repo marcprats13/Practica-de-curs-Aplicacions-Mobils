@@ -11,29 +11,48 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TripleTriad">
+
+        <!-- SPLASH: pantalla inicial -->
         <activity
-            android:name=".ui.screens.ResultsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_results"
-            android:theme="@style/Theme.TripleTriad" />
-        <activity
-            android:name=".ui.screens.GameActivity"
-            android:exported="false"
-            android:label="@string/title_activity_game"
-            android:theme="@style/Theme.TripleTriad" />
-        <activity
-            android:name=".ui.screens.MainActivity"
+            android:name=".ui.screens.SplashActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.TripleTriad">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.screens.HelpActivity" />
-        <activity android:name=".ui.screens.ConfigurationActivity" />
+
+        <!-- MAIN: menú principal (ja no és el launcher) -->
+        <activity
+            android:name=".ui.screens.MainActivity"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.TripleTriad" />
+
+        <activity
+            android:name=".ui.screens.HelpActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TripleTriad" />
+
+        <activity
+            android:name=".ui.screens.ConfigurationActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TripleTriad" />
+
+        <activity
+            android:name=".ui.screens.GameActivity"
+            android:exported="false"
+            android:label="@string/title_activity_game"
+            android:theme="@style/Theme.TripleTriad" />
+
+        <activity
+            android:name=".ui.screens.ResultsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_results"
+            android:theme="@style/Theme.TripleTriad" />
+
     </application>
 
 </manifest>

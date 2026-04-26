@@ -88,4 +88,7 @@
     <string name="config_reverse_title">Modo Inverso</string>
     <string name="config_reverse_sub">El número menor captura al mayor</string>
     <string name="config_btn_start">COMENZAR PARTIDA</string>
+
+    <!-- Load Screen -->
+    <string name="splash_loading">Cargando…</string>
 </resources>
