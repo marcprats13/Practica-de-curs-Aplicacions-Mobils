@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tripletriad.ui.theme.TripleTriadTheme
 
@@ -48,7 +47,8 @@ class ConfigurationActivity : ComponentActivity() {
 @Composable
 fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit) {
     // Definición de los estados que recordarán lo que escribe el usuario
-    var alias by remember { mutableStateOf("Jugador1") }
+    var alias by remember { mutableStateOf("") }
+    var isAliasError by remember { mutableStateOf(false) }
     var isTimeEnabled by remember { mutableStateOf(false) }
     var isBordersMode by remember { mutableStateOf(false) }
     var isReverseMode by remember { mutableStateOf(false) }
@@ -68,8 +68,22 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
         // Campo para el Alias
         OutlinedTextField(
             value = alias,
-            onValueChange = { alias = it },
+            onValueChange = {
+                alias = it
+                if (it.isNotBlank()) {
+                    isAliasError = false
+                }
+            },
             label = { Text("Alias del jugador") },
+            isError = isAliasError,
+            supportingText = {
+                if (isAliasError) {
+                    Text(
+                        text = "Alias obligatorio para empezar partida",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -81,7 +95,7 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Control de Tiempo (25s)")
+            Text("Control de Tiempo (60s)")
             Switch(checked = isTimeEnabled, onCheckedChange = { isTimeEnabled = it })
         }
 
@@ -119,7 +133,7 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
                 if (alias.isNotBlank()) {
                     onStartGame(alias, isTimeEnabled, isBordersMode, isReverseMode)
                 } else {
-                    Toast.makeText(context, "El Alias no puede estar vacío", Toast.LENGTH_SHORT).show()
+                    isAliasError = true
                 }
             },
             modifier = Modifier.fillMaxWidth()
