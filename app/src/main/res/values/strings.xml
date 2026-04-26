@@ -75,4 +75,17 @@
     <string name="results_btn_play_again">NUEVA PARTIDA</string>
     <string name="results_btn_exit">SALIR</string>
     <string name="results_chooser">Enviar Log…</string>
+
+    <!-- Configuration Screen -->
+    <string name="config_title">CONFIGURACIÓN</string>
+    <string name="config_subtitle">NUEVA PARTIDA</string>
+    <string name="config_alias_label">Alias del jugador</string>
+    <string name="config_alias_error">El alias es obligatorio para comenzar</string>
+    <string name="config_time_title">Control de Tiempo</string>
+    <string name="config_time_sub">El turno tiene un límite de 50 segundos</string>
+    <string name="config_borders_title">Modo Fronteras</string>
+    <string name="config_borders_sub">El tablero se conecta por los bordes</string>
+    <string name="config_reverse_title">Modo Inverso</string>
+    <string name="config_reverse_sub">El número menor captura al mayor</string>
+    <string name="config_btn_start">COMENZAR PARTIDA</string>
 </resources>
