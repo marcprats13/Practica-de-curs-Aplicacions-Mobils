@@ -17,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
@@ -25,6 +24,8 @@ import com.example.tripletriad.R
 import com.example.tripletriad.ui.theme.*
 import kotlinx.coroutines.delay
 import com.example.tripletriad.utils.IntentKeys
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tripletriad.viewmodel.ConfigurationViewModel
 
 class ConfigurationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +36,10 @@ class ConfigurationActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = TtBgDeep
                 ) {
+                    val viewModel: ConfigurationViewModel = viewModel()
+
                     ConfiguracionScreen(
+                        viewModel = viewModel,
                         onStartGame = { alias, isTimeEnabled, isBorders, isReverse ->
                             val intent = Intent(this, GameActivity::class.java).apply {
                                 putExtra(IntentKeys.EXTRA_ALIAS,        alias)
@@ -54,13 +58,9 @@ class ConfigurationActivity : ComponentActivity() {
 }
 
 @Composable
-fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit) {
-
-    var alias         by remember { mutableStateOf("") }
-    var isAliasError  by remember { mutableStateOf(false) }
-    var isTimeEnabled by remember { mutableStateOf(false) }
-    var isBordersMode by remember { mutableStateOf(false) }
-    var isReverseMode by remember { mutableStateOf(false) }
+fun ConfiguracionScreen(
+    viewModel: ConfigurationViewModel,
+    onStartGame: (String, Boolean, Boolean, Boolean) -> Unit) {
 
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { delay(80); visible = true }
@@ -114,8 +114,8 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
                     modifier = Modifier
                         .fillMaxWidth()
                         .border(
-                            width = if (isAliasError) 1.5.dp else 1.dp,
-                            color = if (isAliasError) TtOpponentRed else TtBorder,
+                            width = if (viewModel.isAliasError) 1.5.dp else 1.dp,
+                            color = if (viewModel.isAliasError) TtOpponentRed else TtBorder,
                             shape = RoundedCornerShape(6.dp)
                         )
                         .background(TtBgSurface.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
@@ -130,14 +130,14 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
                         fontWeight = FontWeight.SemiBold
                     )
                     OutlinedTextField(
-                        value = alias,
+                        value = viewModel.alias,
                         onValueChange = {
-                            alias = it
-                            if (it.isNotBlank()) isAliasError = false
+                            viewModel.alias = it
+                            if (it.isNotBlank()) viewModel.isAliasError = false
                         },
-                        placeholder = { Text("ex: Squall", color = TtTextDim, fontSize = 14.sp) },
+                        placeholder = { Text("ex: Jugador", color = TtTextDim, fontSize = 14.sp) },
                         singleLine = true,
-                        isError = isAliasError,
+                        isError = viewModel.isAliasError,
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor       = TtBluePrimary,
@@ -151,7 +151,7 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
                             errorContainerColor      = TtOpponentRed.copy(alpha = 0.05f)
                         )
                     )
-                    AnimatedVisibility(visible = isAliasError) {
+                    AnimatedVisibility(visible = viewModel.isAliasError) {
                         Text(
                             text = stringResource(R.string.config_alias_error),
                             fontSize = 11.sp,
@@ -164,7 +164,7 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
 
             Spacer(Modifier.height(16.dp))
 
-            // ── Opcions de joc ────────────────────────────────────────────
+            // Opciones de juego
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(tween(700, 300)) + slideInVertically(tween(700, 300)) { 40 }
@@ -180,24 +180,24 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
                         title       = stringResource(R.string.config_time_title),
                         subtitle    = stringResource(R.string.config_time_sub),
                         icon        = "⏱",
-                        checked     = isTimeEnabled,
-                        onCheckedChange = { isTimeEnabled = it },
+                        checked     = viewModel.isTimeEnabled,
+                        onCheckedChange = { viewModel.isTimeEnabled = it },
                         showDivider = true
                     )
                     ConfigOptionRow(
                         title       = stringResource(R.string.config_borders_title),
                         subtitle    = stringResource(R.string.config_borders_sub),
                         icon        = "⊕",
-                        checked     = isBordersMode,
-                        onCheckedChange = { isBordersMode = it },
+                        checked     = viewModel.isBordersMode,
+                        onCheckedChange = { viewModel.isBordersMode = it },
                         showDivider = true
                     )
                     ConfigOptionRow(
                         title       = stringResource(R.string.config_reverse_title),
                         subtitle    = stringResource(R.string.config_reverse_sub),
                         icon        = "↕",
-                        checked     = isReverseMode,
-                        onCheckedChange = { isReverseMode = it },
+                        checked     = viewModel.isReverseMode,
+                        onCheckedChange = { viewModel.isReverseMode = it },
                         showDivider = false
                     )
                 }
@@ -212,10 +212,10 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
             ) {
                 StartButton(
                     onClick = {
-                        if (alias.isNotBlank()) {
-                            onStartGame(alias, isTimeEnabled, isBordersMode, isReverseMode)
+                        if (viewModel.alias.isNotBlank()) {
+                            onStartGame(viewModel.alias, viewModel.isTimeEnabled, viewModel.isBordersMode, viewModel.isReverseMode)
                         } else {
-                            isAliasError = true
+                            viewModel.isAliasError = true
                         }
                     }
                 )
