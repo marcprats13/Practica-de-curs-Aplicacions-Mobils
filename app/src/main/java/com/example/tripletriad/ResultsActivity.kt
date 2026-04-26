@@ -33,20 +33,26 @@ class ResultsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val alias = intent.getStringExtra(IntentKeys.EXTRA_ALIAS) ?: "Invitat"
-        val size  = intent.getIntExtra(IntentKeys.EXTRA_SIZE, GameSettings.DEFAULT_GRID_SIZE)
         val time  = intent.getIntExtra(IntentKeys.EXTRA_TIME_SPENT, 0)
         val p1    = intent.getIntExtra(IntentKeys.EXTRA_P1_SCORE, 0)
         val opp   = intent.getIntExtra(IntentKeys.EXTRA_OPP_SCORE, 0)
+        val borders = intent.getBooleanExtra(IntentKeys.EXTRA_BORDERS_MODE, false)
+        val reverse = intent.getBooleanExtra(IntentKeys.EXTRA_REVERSE_MODE, false)
+
+        val size = GameSettings.DEFAULT_GRID_SIZE
 
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
         val now = LocalDateTime.now().format(formatter)
 
         val logResumen = """
+            RESUMEN DE LA PARTIDA
             Alias: $alias
-            Mida tauler: ${size}x${size}
-            Temps emprat: $time segons
-            Resultat: Jugador $p1 - Màquina $opp
-            Finalitzat el: $now
+            Mida Parrilla: ${size}x${size}
+            Tiempo empleado: $time segundos
+            Resultado: ${if (p1 > opp) "Victoria" else "Derrorta"} ($p1 - $opp)
+            Finalizado el: $now
+            Modo Fronteras: ${if (borders) "Activado" else "Desactivado"}
+            Modo Inverso: ${if (reverse) "Activado" else "Desactivado"}
         """.trimIndent()
 
         setContent {

@@ -29,19 +29,13 @@ class ConfigurationActivity : ComponentActivity() {
                 ) {
                     ConfiguracionScreen(
                         onStartGame = { alias, isTimeEnabled, isBorders, isReverse ->
-                            // 1. Preparamos el Intent explícito hacia el Juego
                             val intent = Intent(this, GameActivity::class.java).apply {
-                                // 2. Pasamos los datos introducidos
                                 putExtra(IntentKeys.EXTRA_ALIAS, alias)
-                                putExtra(IntentKeys.EXTRA_SIZE, GameSettings.DEFAULT_GRID_SIZE)
                                 putExtra(IntentKeys.EXTRA_TIME_CONTROL, isTimeEnabled)
                                 putExtra(IntentKeys.EXTRA_BORDERS_MODE, isBorders)
                                 putExtra(IntentKeys.EXTRA_REVERSE_MODE, isReverse)
                             }
-                            // 3. Iniciamos la actividad
                             startActivity(intent)
-
-                            // 4. MATAMOS esta actividad para que no quede en el Back Stack!!
                             finish()
                         }
                     )
@@ -112,7 +106,7 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
         ) {
             Column {
                 Text("Modo Inverso")
-                Text("El número MENOR captura al mayor", style = MaterialTheme.typography.bodySmall)
+                Text("El número menor captura al mayor", style = MaterialTheme.typography.bodySmall)
             }
             Switch(checked = isReverseMode, onCheckedChange = { isReverseMode = it })
         }

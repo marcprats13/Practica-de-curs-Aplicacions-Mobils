@@ -50,9 +50,6 @@
     <string name="dialog_win_title">VICTORIA</string>
     <string name="dialog_lose_title">DERROTA</string>
     <string name="dialog_draw_title">EMPATE</string>
-    <string name="dialog_win_sub">Has dominado el tablero</string>
-    <string name="dialog_lose_sub">El rival te ha superado</string>
-    <string name="dialog_draw_sub">Igual de fuerza de los dos bandos</string>
     <string name="dialog_btn_results">VER RESULTADOS</string>
     <string name="dialog_score_format">%1$d — %2$d</string>
 
@@ -68,7 +65,7 @@
     <string name="results_stat_size">Tamaño del Tablero</string>
     <string name="results_stat_time">Tiempo de partida</string>
     <string name="results_stat_date">Data</string>
-    <string name="results_stat_seconds">%1$d segons</string>
+    <string name="results_stat_seconds">%1$d segundos</string>
     <string name="results_stat_grid">%1$dx%1$d</string>
     <string name="results_log_title">LOG DE PARTIDA</string>
     <string name="results_email_label">Email destinatario</string>

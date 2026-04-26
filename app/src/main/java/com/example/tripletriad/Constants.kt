@@ -1,9 +1,7 @@
 package com.example.tripletriad
 
 object IntentKeys {
-    // Claves para el paso de datos
     const val EXTRA_ALIAS = "EXTRA_ALIAS"
-    const val EXTRA_SIZE = "EXTRA_SIZE"
     const val EXTRA_TIME_CONTROL = "EXTRA_TIME_CONTROL"
     const val EXTRA_BORDERS_MODE = "EXTRA_BORDERS_MODE"
     const val EXTRA_REVERSE_MODE = "EXTRA_REVERSE_MODE"
@@ -13,9 +11,8 @@ object IntentKeys {
 }
 
 object GameSettings {
-    // Configuración general del juego
     const val DEFAULT_GRID_SIZE = 3
-    const val DEFAULT_TIME_SECONDS = 50
+    const val DEFAULT_TIME_SECONDS = 60
     const val AI_THINKING_DELAY = 1000L
 }
 

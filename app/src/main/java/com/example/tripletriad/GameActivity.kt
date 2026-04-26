@@ -33,7 +33,6 @@ class GameActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val playerName    = intent.getStringExtra(IntentKeys.EXTRA_ALIAS) ?: "Player 1"
-        val gridSize      = intent.getIntExtra(IntentKeys.EXTRA_SIZE, 3)
         val isTimeEnabled = intent.getBooleanExtra(IntentKeys.EXTRA_TIME_CONTROL, false)
         val isBordersMode = intent.getBooleanExtra(IntentKeys.EXTRA_BORDERS_MODE, false)
         val isReverseMode = intent.getBooleanExtra(IntentKeys.EXTRA_REVERSE_MODE, false)
@@ -41,6 +40,8 @@ class GameActivity : ComponentActivity() {
         setContent {
             TripleTriadTheme {
                 val gameViewModel: GameViewModel = viewModel()
+
+                val startTime = remember { System.currentTimeMillis() }
 
                 LaunchedEffect(Unit) {
 
@@ -51,11 +52,16 @@ class GameActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = TtBgDeep
                 ) {
-                    GameScreen(playerName, gridSize, isTimeEnabled, gameViewModel)
+                    GameScreen(playerName, GameSettings.DEFAULT_GRID_SIZE, isTimeEnabled, gameViewModel)
 
                     // ── AlertDialog de final de partida ──────────────────────
                     if (gameViewModel.isGameOver) {
-                        val timeSpent = if (isTimeEnabled) 50 - gameViewModel.timeLeft else 0
+                        val timeSpent =
+                            if (isTimeEnabled) {
+                                GameSettings.DEFAULT_TIME_SECONDS - gameViewModel.timeLeft
+                            } else {
+                                ((System.currentTimeMillis() - startTime) / 1000).toInt()
+                            }
                         val outcome = when {
                             gameViewModel.playerScore > gameViewModel.opponentScore -> GameOutcome.WIN
                             gameViewModel.playerScore < gameViewModel.opponentScore -> GameOutcome.LOSE
@@ -68,10 +74,11 @@ class GameActivity : ComponentActivity() {
                             onConfirm     = {
                                 val intent = Intent(this@GameActivity, ResultsActivity::class.java).apply {
                                     putExtra(IntentKeys.EXTRA_ALIAS,      playerName)
-                                    putExtra(IntentKeys.EXTRA_SIZE,      3)
                                     putExtra(IntentKeys.EXTRA_P1_SCORE,  gameViewModel.playerScore)
                                     putExtra(IntentKeys.EXTRA_OPP_SCORE, gameViewModel.opponentScore)
                                     putExtra(IntentKeys.EXTRA_TIME_SPENT,      timeSpent)
+                                    putExtra(IntentKeys.EXTRA_BORDERS_MODE, isBordersMode)
+                                    putExtra(IntentKeys.EXTRA_REVERSE_MODE, isReverseMode)
                                 }
                                 startActivity(intent)
                                 finish()
@@ -104,11 +111,6 @@ fun GameOverDialog(
         GameOutcome.WIN  -> R.string.dialog_win_title
         GameOutcome.LOSE -> R.string.dialog_lose_title
         GameOutcome.DRAW -> R.string.dialog_draw_title
-    }
-    val subRes = when (outcome) {
-        GameOutcome.WIN  -> R.string.dialog_win_sub
-        GameOutcome.LOSE -> R.string.dialog_lose_sub
-        GameOutcome.DRAW -> R.string.dialog_draw_sub
     }
     val icon = when (outcome) {
         GameOutcome.WIN  -> "★"
@@ -172,15 +174,6 @@ fun GameOverDialog(
                     style = LocalTextStyle.current.copy(
                         shadow = Shadow(color = accentColor.copy(alpha = 0.5f), blurRadius = 16f)
                     )
-                )
-
-                // Subtítol
-                Text(
-                    text = stringResource(subRes),
-                    fontSize = 12.sp,
-                    letterSpacing = 2.sp,
-                    color = TtTextSecondary,
-                    textAlign = TextAlign.Center
                 )
 
                 // Divider
