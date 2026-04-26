@@ -26,7 +26,7 @@ class GameViewModel : ViewModel() {
         // Si la máquina gana el sorteo inicial, empieza ella
         if (!isPlayer1Turn) {
             viewModelScope.launch {
-                delay(1000) // Pausa de "pensamiento" antes de su primera carta
+                delay(1000) // Pausa de "pensamiento" antes de la primera carta
                 playOpponentTurn()
             }
         }
@@ -42,6 +42,8 @@ class GameViewModel : ViewModel() {
     var timeLeft by mutableIntStateOf(25) // Por defecto 25, pero lo cambiaremos
         private set
 
+    var isBordersMode = false
+    var isReverseMode = false
     // Objeto clásico de Android para contar hacia atrás
     private var timerJob: Job? = null
 
@@ -63,6 +65,11 @@ class GameViewModel : ViewModel() {
         if (isPlayer1Turn && !isGameOver) {
             selectedCard = card
         }
+    }
+
+    fun setGameRules(borders: Boolean, reverse: Boolean) {
+        isBordersMode = borders
+        isReverseMode = reverse
     }
 
     // Método para jugar una carta en el tablero
@@ -121,36 +128,46 @@ class GameViewModel : ViewModel() {
     private fun checkCaptures(index: Int) {
         val currentCard = board[index] ?: return
 
-        // Definimos los vecinos: arriba, abajo, izquierda, derecha
-        // Para un tablero 3x3 (0-8):
+        // Matemáticas para el Modo Fronteras (Toroidal) o Tablero Normal
+        val topNeighbor = if (isBordersMode && index < 3) index + 6 else index - 3
+        val bottomNeighbor = if (isBordersMode && index > 5) index - 6 else index + 3
+        val leftNeighbor = if (isBordersMode && index % 3 == 0) index + 2 else index - 1
+        val rightNeighbor = if (isBordersMode && index % 3 == 2) index - 2 else index + 1
+
         val neighbors = listOf(
-            Triple(index - 3, "TOP", "BOTTOM"),    // Vecino de arriba
-            Triple(index + 3, "BOTTOM", "TOP"),    // Vecino de abajo
-            Triple(index - 1, "LEFT", "RIGHT"),    // Vecino de izquierda (ojo con bordes)
-            Triple(index + 1, "RIGHT", "LEFT")     // Vecino de derecha (ojo con bordes)
+            Triple(topNeighbor, "TOP", "BOTTOM"),
+            Triple(bottomNeighbor, "BOTTOM", "TOP"),
+            Triple(leftNeighbor, "LEFT", "RIGHT"),
+            Triple(rightNeighbor, "RIGHT", "LEFT")
         )
 
-        for ((neighborIndex, position, opposite) in neighbors) {
-            // Validar que el índice existe y no se sale de los bordes del 3x3
+        for ((neighborIndex, position, _) in neighbors) {
+            // Validar que el índice está dentro del tablero
             if (neighborIndex in 0..8) {
-                // Evitar saltos de fila en izquierda/derecha
-                if (position == "LEFT" && index % 3 == 0) continue
-                if (position == "RIGHT" && index % 3 == 2) continue
+
+                // Si el Modo Fronteras está APAGADO, bloqueamos los saltos de fila
+                if (!isBordersMode) {
+                    if (position == "LEFT" && index % 3 == 0) continue
+                    if (position == "RIGHT" && index % 3 == 2) continue
+                }
 
                 val neighborCard = board[neighborIndex]
                 if (neighborCard != null && neighborCard.owner != currentCard.owner) {
 
-                    // Comparación de valores según la posición
+                    // Función auxiliar para saber si ganamos la captura (Normal o Inversa)
+                    fun wins(myStat: Int, oppStat: Int): Boolean {
+                        return if (isReverseMode) myStat < oppStat else myStat > oppStat
+                    }
+
                     val shouldCapture = when (position) {
-                        "TOP" -> currentCard.top > neighborCard.bottom
-                        "BOTTOM" -> currentCard.bottom > neighborCard.top
-                        "LEFT" -> currentCard.left > neighborCard.right
-                        "RIGHT" -> currentCard.right > neighborCard.left
+                        "TOP" -> wins(currentCard.top, neighborCard.bottom)
+                        "BOTTOM" -> wins(currentCard.bottom, neighborCard.top)
+                        "LEFT" -> wins(currentCard.left, neighborCard.right)
+                        "RIGHT" -> wins(currentCard.right, neighborCard.left)
                         else -> false
                     }
 
                     if (shouldCapture) {
-                        // Cambiamos el dueño de la carta (Captura)
                         board[neighborIndex] = neighborCard.copy(owner = currentCard.owner)
                     }
                 }

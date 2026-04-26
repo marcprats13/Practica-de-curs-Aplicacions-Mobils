@@ -2,6 +2,7 @@ package com.example.tripletriad
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,13 +28,15 @@ class ConfigurationActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     ConfiguracionScreen(
-                        onEmpezarClick = { alias, size, isTimeEnabled ->
+                        onStartGame = { alias, isTimeEnabled, isBorders, isReverse ->
                             // 1. Preparamos el Intent explícito hacia el Juego
                             val intent = Intent(this, GameActivity::class.java).apply {
                                 // 2. Pasamos los datos introducidos
                                 putExtra("EXTRA_ALIAS", alias)
-                                putExtra("EXTRA_SIZE", size)
+                                putExtra("EXTRA_SIZE", 3)
                                 putExtra("EXTRA_TIME_CONTROL", isTimeEnabled)
+                                putExtra("EXTRA_BORDERS_MODE", isBorders)
+                                putExtra("EXTRA_REVERSE_MODE", isReverse)
                             }
                             // 3. Iniciamos la actividad
                             startActivity(intent)
@@ -47,11 +52,14 @@ class ConfigurationActivity : ComponentActivity() {
 }
 
 @Composable
-fun ConfiguracionScreen(onEmpezarClick: (String, Int, Boolean) -> Unit) {
+fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit) {
     // Definición de los estados que recordarán lo que escribe el usuario
     var alias by remember { mutableStateOf("Jugador1") }
-    var gridSizeText by remember { mutableStateOf("3") }
-    var controlTiempo by remember { mutableStateOf(false) }
+    var isTimeEnabled by remember { mutableStateOf(false) }
+    var isBordersMode by remember { mutableStateOf(false) }
+    var isReverseMode by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -60,7 +68,7 @@ fun ConfiguracionScreen(onEmpezarClick: (String, Int, Boolean) -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("CONFIGURACIÓN DE PARTIDA", style = MaterialTheme.typography.titleLarge)
+        Text("CONFIGURACIÓN DE PARTIDA", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(24.dp))
 
         // Campo para el Alias
@@ -73,49 +81,56 @@ fun ConfiguracionScreen(onEmpezarClick: (String, Int, Boolean) -> Unit) {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo para el Tamaño de la Parrilla
-        OutlinedTextField(
-            value = gridSizeText,
-            onValueChange = { gridSizeText = it },
-            label = { Text("Tamaño de la parrilla (ej. 3 para 3x3)") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Checkbox para el Control del Tiempo
+        // 2. Control de Tiempo
         Row(
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Checkbox(
-                checked = controlTiempo,
-                onCheckedChange = { controlTiempo = it }
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Habilitar control de tiempo")
+            Text("Control de Tiempo (25s)")
+            Switch(checked = isTimeEnabled, onCheckedChange = { isTimeEnabled = it })
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        // 3. Modo Fronteras
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text("Modo Fronteras")
+                Text("El tablero se conecta por los bordes", style = MaterialTheme.typography.bodySmall)
+            }
+            Switch(checked = isBordersMode, onCheckedChange = { isBordersMode = it })
+        }
 
+        // 4. Modo Inverso
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text("Modo Inverso")
+                Text("El número MENOR captura al mayor", style = MaterialTheme.typography.bodySmall)
+            }
+            Switch(checked = isReverseMode, onCheckedChange = { isReverseMode = it })
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Botón Jugar con Validación
         Button(
             onClick = {
-                // Parseamos el texto a Int (si falla o está vacío, le ponemos 3 por defecto para evitar cuelgues)
-                val size = gridSizeText.toIntOrNull() ?: 3
-                onEmpezarClick(alias, size, controlTiempo)
+                if (alias.isNotBlank()) {
+                    onStartGame(alias, isTimeEnabled, isBordersMode, isReverseMode)
+                } else {
+                    Toast.makeText(context, "El Alias no puede estar vacío", Toast.LENGTH_SHORT).show()
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Empezar Partida")
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ConfiguracionPreview() {
-    MaterialTheme {
-        ConfiguracionScreen(onEmpezarClick = { _, _, _ -> })
     }
 }

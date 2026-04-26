@@ -35,12 +35,16 @@ class GameActivity : ComponentActivity() {
         val playerName    = intent.getStringExtra("EXTRA_ALIAS") ?: "Player 1"
         val gridSize      = intent.getIntExtra("EXTRA_SIZE", 3)
         val isTimeEnabled = intent.getBooleanExtra("EXTRA_TIME_CONTROL", false)
+        val isBordersMode = intent.getBooleanExtra("EXTRA_BORDERS_MODE", false)
+        val isReverseMode = intent.getBooleanExtra("EXTRA_REVERSE_MODE", false)
 
         setContent {
             TripleTriadTheme {
                 val gameViewModel: GameViewModel = viewModel()
 
                 LaunchedEffect(Unit) {
+
+                    gameViewModel.setGameRules(isBordersMode, isReverseMode)
                     if (isTimeEnabled) gameViewModel.startTimer(50)
                 }
 

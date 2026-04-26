@@ -42,9 +42,9 @@
     <string name="card_legend_bottom">▼ Inferior</string>
 
     <!-- Game Screen -->
-    <string name="game_your_hand">LA TEVA MÀ</string>
-    <string name="game_turn_yours">EL TEU TORN</string>
-    <string name="game_turn_opponent">TORN DEL RIVAL</string>
+    <string name="game_your_hand">TU MANO</string>
+    <string name="game_turn_yours">TU TURNO</string>
+    <string name="game_turn_opponent">TURNO DEL RIVAL</string>
 
     <!-- End Game Dialog -->
     <string name="dialog_win_title">VICTORIA</string>
