@@ -58,7 +58,7 @@
     <string name="results_title">RESULTADOS</string>
     <string name="results_subtitle">FIN DE PARTIDA</string>
     <string name="results_player_label">JUGADOR</string>
-    <string name="results_machine_label">MAQUINA</string>
+    <string name="results_machine_label">OPONENTE</string>
     <string name="results_win">VICTORIA</string>
     <string name="results_lose">DERROTA</string>
     <string name="results_draw">EMPATE</string>

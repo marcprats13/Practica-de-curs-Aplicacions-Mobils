@@ -1,4 +1,4 @@
-package com.example.tripletriad
+package com.example.tripletriad.ui.screens
 
 import android.content.Intent
 import android.os.Bundle
@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
+import com.example.tripletriad.R
 import com.example.tripletriad.ui.theme.*
 import kotlinx.coroutines.delay
 
