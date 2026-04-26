@@ -96,4 +96,11 @@
 
     <!-- Load Screen -->
     <string name="splash_loading">Cargando…</string>
+
+    <!-- Splash Screen -->
+    <string name="splash_card_top">7</string>
+    <string name="splash_card_bottom">4</string>
+    <string name="splash_card_left">5</string>
+    <string name="splash_card_right">8</string>
+    <string name="splash_card_center">◆</string>
 </resources>

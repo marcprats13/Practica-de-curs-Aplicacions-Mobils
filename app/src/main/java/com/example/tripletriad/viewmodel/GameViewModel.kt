@@ -31,7 +31,7 @@ class GameViewModel : ViewModel() {
         // Si la máquina gana el sorteo inicial, empieza ella
         if (!isPlayer1Turn) {
             viewModelScope.launch {
-                delay(1000) // Pausa de "pensamiento" antes de la primera carta
+                delay(GameSettings.AI_THINKING_DELAY) // Pausa de pensamiento antes de la primera carta
                 playOpponentTurn()
             }
         }
@@ -141,7 +141,7 @@ class GameViewModel : ViewModel() {
                         bestCard = card
                         bestIndex = index
                     } else if (simulatedCaptures == maxCaptures && Random.Default.nextBoolean()) {
-                        // Si empata (ambas capturan 0), aplicamos un poco de azar
+                        // Si empata (ambas capture 0), aplicamos un poco de azar
                         bestCard = card
                         bestIndex = index
                     }
@@ -169,97 +169,70 @@ class GameViewModel : ViewModel() {
     private fun checkCaptures(index: Int) {
         val currentCard = board[index] ?: return
 
-        // Calculos para los modos frontera y normal
-        val topNeighbor = if (isBordersMode && index < 3) index + 6 else index - 3
-        val bottomNeighbor = if (isBordersMode && index > 5) index - 6 else index + 3
-        val leftNeighbor = if (isBordersMode && index % 3 == 0) index + 2 else index - 1
-        val rightNeighbor = if (isBordersMode && index % 3 == 2) index - 2 else index + 1
+        fun wins(myStat: Int, oppStat: Int): Boolean {
+            return if (isReverseMode) myStat < oppStat else myStat > oppStat
+        }
 
-        val neighbors = listOf(
-            Triple(topNeighbor, "TOP", "BOTTOM"),
-            Triple(bottomNeighbor, "BOTTOM", "TOP"),
-            Triple(leftNeighbor, "LEFT", "RIGHT"),
-            Triple(rightNeighbor, "RIGHT", "LEFT")
-        )
-
-        for ((neighborIndex, position, _) in neighbors) {
-            // Validar que el índice está dentro del tablero
-            if (neighborIndex in 0..8) {
-
-                // Si el Modo Fronteras está apagado, bloqueamos los saltos de fila
-                if (!isBordersMode) {
-                    if (position == "LEFT" && index % 3 == 0) continue
-                    if (position == "RIGHT" && index % 3 == 2) continue
+        for ((neighborIndex, position) in getValidNeighbors(index)) {
+            val neighborCard = board[neighborIndex]
+            if (neighborCard != null && neighborCard.owner != currentCard.owner) {
+                val shouldCapture = when (position) {
+                    "TOP" -> wins(currentCard.top, neighborCard.bottom)
+                    "BOTTOM" -> wins(currentCard.bottom, neighborCard.top)
+                    "LEFT" -> wins(currentCard.left, neighborCard.right)
+                    "RIGHT" -> wins(currentCard.right, neighborCard.left)
+                    else -> false
                 }
 
-                val neighborCard = board[neighborIndex]
-                if (neighborCard != null && neighborCard.owner != currentCard.owner) {
-
-                    // Función auxiliar para saber si ganamos la captura (Depende de modalidad normal o inversa)
-                    fun wins(myStat: Int, oppStat: Int): Boolean {
-                        return if (isReverseMode) myStat < oppStat else myStat > oppStat
-                    }
-
-                    val shouldCapture = when (position) {
-                        "TOP" -> wins(currentCard.top, neighborCard.bottom)
-                        "BOTTOM" -> wins(currentCard.bottom, neighborCard.top)
-                        "LEFT" -> wins(currentCard.left, neighborCard.right)
-                        "RIGHT" -> wins(currentCard.right, neighborCard.left)
-                        else -> false
-                    }
-
-                    if (shouldCapture) {
-                        board[neighborIndex] = neighborCard.copy(owner = currentCard.owner)
-                    }
+                if (shouldCapture) {
+                    board[neighborIndex] = neighborCard.copy(owner = currentCard.owner)
                 }
             }
         }
     }
-
-    // Función auxiliar para el algoritmo del greedy para la IA
+    // Para el algoritmo greedy
     private fun simulateCaptures(card: Card, index: Int): Int {
         var captures = 0
 
-        val topNeighbor = if (isBordersMode && index < 3) index + 6 else index - 3
-        val bottomNeighbor = if (isBordersMode && index > 5) index - 6 else index + 3
-        val leftNeighbor = if (isBordersMode && index % 3 == 0) index + 2 else index - 1
-        val rightNeighbor = if (isBordersMode && index % 3 == 2) index - 2 else index + 1
+        fun wins(myStat: Int, oppStat: Int): Boolean {
+            return if (isReverseMode) myStat < oppStat else myStat > oppStat
+        }
 
-        val neighbors = listOf(
-            Triple(topNeighbor, "TOP", "BOTTOM"),
-            Triple(bottomNeighbor, "BOTTOM", "TOP"),
-            Triple(leftNeighbor, "LEFT", "RIGHT"),
-            Triple(rightNeighbor, "RIGHT", "LEFT")
-        )
-
-        for ((neighborIndex, position, _) in neighbors) {
-            if (neighborIndex in 0..8) {
-
-                if (!isBordersMode) {
-                    if (position == "LEFT" && index % 3 == 0) continue
-                    if (position == "RIGHT" && index % 3 == 2) continue
+        for ((neighborIndex, position) in getValidNeighbors(index)) {
+            val neighborCard = board[neighborIndex]
+            // Solo simulamos contra cartas del jugador 1
+            if (neighborCard != null && neighborCard.owner == Player.PLAYER_1) {
+                val shouldCapture = when (position) {
+                    "TOP" -> wins(card.top, neighborCard.bottom)
+                    "BOTTOM" -> wins(card.bottom, neighborCard.top)
+                    "LEFT" -> wins(card.left, neighborCard.right)
+                    "RIGHT" -> wins(card.right, neighborCard.left)
+                    else -> false
                 }
 
-                val neighborCard = board[neighborIndex]
-                if (neighborCard != null && neighborCard.owner == Player.PLAYER_1) {
-
-                    fun wins(myStat: Int, oppStat: Int): Boolean {
-                        return if (isReverseMode) myStat < oppStat else myStat > oppStat
-                    }
-
-                    val shouldCapture = when (position) {
-                        "TOP" -> wins(card.top, neighborCard.bottom)
-                        "BOTTOM" -> wins(card.bottom, neighborCard.top)
-                        "LEFT" -> wins(card.left, neighborCard.right)
-                        "RIGHT" -> wins(card.right, neighborCard.left)
-                        else -> false
-                    }
-
-                    if (shouldCapture) captures++
-                }
+                if (shouldCapture) captures++
             }
         }
         return captures
+    }
+
+    private fun getValidNeighbors(index: Int): List<Pair<Int, String>> {
+        val top = if (isBordersMode && index < 3) index + 6 else index - 3
+        val bottom = if (isBordersMode && index > 5) index - 6 else index + 3
+        val left = if (isBordersMode && index % 3 == 0) index + 2 else index - 1
+        val right = if (isBordersMode && index % 3 == 2) index - 2 else index + 1
+
+        return listOf(
+            top to "TOP",
+            bottom to "BOTTOM",
+            left to "LEFT",
+            right to "RIGHT"
+        ).filter { (nIndex, pos) ->
+            if (nIndex !in 0..8) false // Fuera del tablero
+            else if (!isBordersMode && pos == "LEFT" && index % 3 == 0) false // Bloqueo muro izquierdo
+            else if (!isBordersMode && pos == "RIGHT" && index % 3 == 2) false // Bloqueo muro derecho
+            else true
+        }
     }
 
     private fun updateScores() {
@@ -286,7 +259,7 @@ class GameViewModel : ViewModel() {
                     delay(GameSettings.AI_THINKING_DELAY) // Espera un segundo
                     timeLeft--
 
-                    // "Control de si tiempo agotado"
+                    // Control de si el tiempo esta agotado
                     if (timeLeft <= 0) {
                         isGameOver = true
                     }

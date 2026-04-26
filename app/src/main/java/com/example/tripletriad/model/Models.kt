@@ -1,9 +1,9 @@
 package com.example.tripletriad.model
 
-// Enum per saber de qui és la carta
+// Enum para saber de quien es la carta
 enum class Player { NONE, PLAYER_1, OPPONENT }
 
-// El model de dades d'una Carta de Triple Triad
+// El model de datos de una Carta de Triple Triad
 data class Card(
     val top: Int,
     val bottom: Int,
@@ -23,7 +23,7 @@ enum class CardRarity {
     COMMON, UNCOMMON, RARE, EPIC, LEGENDARY
 }
 
-// Factoría per generar cartes amb noms temàtics
+// Factoria para nombres que ya usaremos mas adelante
 object CardFactory {
     private val cardNames = listOf(
         "Ifrit", "Shiva", "Ramuh", "Titan", "Bahamut",

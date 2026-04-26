@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.*
 import com.example.tripletriad.R
 import com.example.tripletriad.ui.theme.*
 import kotlinx.coroutines.delay
+import com.example.tripletriad.utils.AnimationConfig
 
 class SplashActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,21 +48,19 @@ class SplashActivity : ComponentActivity() {
 @Composable
 fun SplashScreen(onFinished: () -> Unit) {
 
-    // ── Estat d'animació ──────────────────────────────────────────────
+    // Estado de animación
     var showLogo    by remember { mutableStateOf(false) }
     var showTitle   by remember { mutableStateOf(false) }
-    var showSub     by remember { mutableStateOf(false) }
     var showLoading by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         delay(200);  showLogo    = true
         delay(600);  showTitle   = true
-        delay(400);  showSub     = true
         delay(300);  showLoading = true
         delay(1200); onFinished()
     }
 
-    // Glow pulsant
+    // El glow pulsante
     val infiniteTransition = rememberInfiniteTransition(label = "splash_glow")
     val glowAlpha by infiniteTransition.animateFloat(
         initialValue = 0.3f, targetValue = 0.9f,
@@ -85,7 +84,7 @@ fun SplashScreen(onFinished: () -> Unit) {
             verticalArrangement = Arrangement.Center
         ) {
 
-            // ── Carta gran animada ────────────────────────────────────────
+            // Carta grande animada
             AnimatedVisibility(
                 visible = showLogo,
                 enter = fadeIn(tween(800)) + scaleIn(tween(800, easing = EaseOutCubic))
@@ -107,38 +106,38 @@ fun SplashScreen(onFinished: () -> Unit) {
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Valors de la carta
+                    // Valores de la carta
                     Text(
-                        text = "7",
+                        text = stringResource(R.string.splash_card_top),
                         color = TtBlueLight,
                         fontWeight = FontWeight.Black,
                         fontSize = 18.sp,
                         modifier = Modifier.align(Alignment.TopCenter).padding(top = 10.dp)
                     )
                     Text(
-                        text = "4",
+                        text = stringResource(R.string.splash_card_bottom),
                         color = TtBlueLight,
                         fontWeight = FontWeight.Black,
                         fontSize = 18.sp,
                         modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 10.dp)
                     )
                     Text(
-                        text = "5",
+                        text = stringResource(R.string.splash_card_left),
                         color = TtBlueLight,
                         fontWeight = FontWeight.Black,
                         fontSize = 18.sp,
                         modifier = Modifier.align(Alignment.CenterStart).padding(start = 10.dp)
                     )
                     Text(
-                        text = "8",
+                        text = stringResource(R.string.splash_card_right),
                         color = TtBlueLight,
                         fontWeight = FontWeight.Black,
                         fontSize = 18.sp,
                         modifier = Modifier.align(Alignment.CenterEnd).padding(end = 10.dp)
                     )
-                    // Diamant central
+                    // Diamante central
                     Text(
-                        text = "◆",
+                        text = stringResource(R.string.splash_card_center),
                         color = TtGoldLight,
                         fontSize = 32.sp,
                         style = androidx.compose.ui.text.TextStyle(
@@ -153,10 +152,11 @@ fun SplashScreen(onFinished: () -> Unit) {
 
             Spacer(Modifier.height(40.dp))
 
-            // ── Títol ─────────────────────────────────────────────────────
+            // Titulo
             AnimatedVisibility(
                 visible = showTitle,
-                enter = fadeIn(tween(700)) + slideInVertically(tween(700, easing = EaseOutCubic)) { 40 }
+                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL)) + slideInVertically(tween(
+                    AnimationConfig.DURATION_NORMAL, easing = EaseOutCubic)) { 40 }
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     HorizontalDividerWithDiamonds()
@@ -192,28 +192,13 @@ fun SplashScreen(onFinished: () -> Unit) {
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
 
-            // ── Subtítol ──────────────────────────────────────────────────
-            AnimatedVisibility(
-                visible = showSub,
-                enter = fadeIn(tween(600))
-            ) {
-                Text(
-                    text = "FINAL FANTASY VIII",
-                    fontSize = 11.sp,
-                    letterSpacing = 4.sp,
-                    color = TtTextSecondary,
-                    fontWeight = FontWeight.Medium
-                )
-            }
+            Spacer(Modifier.height(76.dp))
 
-            Spacer(Modifier.height(60.dp))
-
-            // ── Loading ───────────────────────────────────────────────────
+            // Animación de loading
             AnimatedVisibility(
                 visible = showLoading,
-                enter = fadeIn(tween(500))
+                enter = fadeIn(tween(AnimationConfig.DURATION_FAST))
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
