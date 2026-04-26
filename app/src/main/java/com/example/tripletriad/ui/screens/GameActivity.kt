@@ -27,11 +27,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tripletriad.model.Card
 import com.example.tripletriad.utils.GameSettings
 import com.example.tripletriad.viewmodel.GameViewModel
-import com.example.tripletriad.utils.IntentKeys
 import com.example.tripletriad.model.Player
 import com.example.tripletriad.R
 import com.example.tripletriad.ui.theme.*
 import kotlinx.coroutines.delay
+import com.example.tripletriad.utils.IntentKeys
 
 class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

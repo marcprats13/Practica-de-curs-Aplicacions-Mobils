@@ -27,13 +27,13 @@ import androidx.compose.ui.unit.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tripletriad.utils.EmailConfig
 import com.example.tripletriad.utils.GameSettings
-import com.example.tripletriad.utils.IntentKeys
 import com.example.tripletriad.R
 import com.example.tripletriad.ui.theme.*
 import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import com.example.tripletriad.viewmodel.ResultsViewModel
+import com.example.tripletriad.utils.IntentKeys
 
 class ResultsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

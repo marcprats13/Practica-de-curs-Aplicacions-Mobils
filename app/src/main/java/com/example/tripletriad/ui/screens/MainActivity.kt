@@ -15,9 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
@@ -35,9 +33,9 @@ class MainActivity : ComponentActivity() {
                     color = TtBgDeep
                 ) {
                     MainMenuScreen(
-                        onHelp     = { startActivity(Intent(this, HelpActivity::class.java)) },
+                        onHelp      = { startActivity(Intent(this, HelpActivity::class.java)) },
                         onStartGame = { startActivity(Intent(this, ConfigurationActivity::class.java)) },
-                        onExit     = { finishAffinity() }
+                        onExit      = { finishAffinity() }
                     )
                 }
             }
@@ -74,7 +72,6 @@ fun MainMenuScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // ── Títol ────────────────────────────────────────────────────
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(tween(800)) + slideInVertically(tween(800, easing = EaseOutCubic)) { -80 }
@@ -82,7 +79,6 @@ fun MainMenuScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     HorizontalDividerWithDiamonds()
                     Spacer(Modifier.height(24.dp))
-
                     Text(
                         text = stringResource(R.string.menu_title_top),
                         fontSize = 48.sp,
@@ -104,14 +100,12 @@ fun MainMenuScreen(
                         )
                     )
                     Spacer(Modifier.height(8.dp))
-
                     HorizontalDividerWithDiamonds()
                 }
             }
 
             Spacer(Modifier.height(56.dp))
 
-            // ── Botons ───────────────────────────────────────────────────
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(tween(800, delayMillis = 300)) +
@@ -129,7 +123,6 @@ fun MainMenuScreen(
 
             Spacer(Modifier.height(48.dp))
 
-            // ── Cartes decoratives ───────────────────────────────────────
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(tween(1000, delayMillis = 600))
@@ -145,55 +138,6 @@ fun MainMenuScreen(
     }
 }
 
-// ─── Background ──────────────────────────────────────────────────────────────
-@Composable
-fun MenuBackground() {
-    val infiniteTransition = rememberInfiniteTransition(label = "bg")
-    val offset by infiniteTransition.animateFloat(
-        initialValue = 0f, targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(8000, easing = LinearEasing)),
-        label = "offset"
-    )
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        drawRect(
-            brush = Brush.radialGradient(
-                colors = listOf(Color(0xFF0D1B3E), TtBgDeep),
-                center = Offset(size.width * 0.5f, size.height * 0.35f),
-                radius = size.height * 0.75f
-            )
-        )
-        drawGrid(this, offset)
-    }
-}
-
-private fun drawGrid(scope: DrawScope, animOffset: Float) {
-    val spacing = 48f
-    val totalCols = (scope.size.width / spacing).toInt() + 2
-    val totalRows = (scope.size.height / spacing).toInt() + 2
-    val shift = (animOffset * spacing) % spacing
-    for (col in 0..totalCols) {
-        val x = col * spacing - shift
-        scope.drawLine(color = TtBorder, strokeWidth = 0.5f, start = Offset(x, 0f), end = Offset(x, scope.size.height))
-    }
-    for (row in 0..totalRows) {
-        val y = row * spacing - shift
-        scope.drawLine(color = TtBorder, strokeWidth = 0.5f, start = Offset(0f, y), end = Offset(scope.size.width, y))
-    }
-}
-
-// ─── Divider decoratiu ────────────────────────────────────────────────────────
-@Composable
-fun HorizontalDividerWithDiamonds() {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth(0.8f)
-    ) {
-        HorizontalDivider(modifier = Modifier.weight(1f), color = TtGold.copy(alpha = 0.4f), thickness = 1.dp)
-        Text(text = "  ◆  ", color = TtGold, fontSize = 10.sp)
-        HorizontalDivider(modifier = Modifier.weight(1f), color = TtGold.copy(alpha = 0.4f), thickness = 1.dp)
-    }
-}
-
 // ─── Botó de menú ─────────────────────────────────────────────────────────────
 @Composable
 fun MenuButton(label: String, icon: String, isPrimary: Boolean, onClick: () -> Unit) {
@@ -203,7 +147,6 @@ fun MenuButton(label: String, icon: String, isPrimary: Boolean, onClick: () -> U
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         label = "scale"
     )
-
     val borderColor = if (isPrimary) TtGold else TtBorder
     val bgColor     = if (isPrimary) TtBluePrimary.copy(alpha = 0.15f) else TtBgSurface.copy(alpha = 0.6f)
     val textColor   = if (isPrimary) TtGoldLight else TtTextSecondary
@@ -228,7 +171,6 @@ fun MenuButton(label: String, icon: String, isPrimary: Boolean, onClick: () -> U
             Text(text = label, fontSize = 14.sp, letterSpacing = 3.sp, fontWeight = FontWeight.SemiBold, color = textColor)
         }
     }
-
     LaunchedEffect(pressed) { if (pressed) { delay(150); pressed = false } }
 }
 

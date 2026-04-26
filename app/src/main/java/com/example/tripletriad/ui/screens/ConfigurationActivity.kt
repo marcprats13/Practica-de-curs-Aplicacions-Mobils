@@ -1,4 +1,4 @@
-package com.example.tripletriad
+package com.example.tripletriad.ui.screens
 
 import android.content.Intent
 import android.os.Bundle
@@ -21,8 +21,10 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
+import com.example.tripletriad.R
 import com.example.tripletriad.ui.theme.*
 import kotlinx.coroutines.delay
+import com.example.tripletriad.utils.IntentKeys
 
 class ConfigurationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +62,6 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
     var isBordersMode by remember { mutableStateOf(false) }
     var isReverseMode by remember { mutableStateOf(false) }
 
-    // Animació d'entrada
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { delay(80); visible = true }
 
@@ -139,18 +140,17 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
                         isError = isAliasError,
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor    = TtBluePrimary,
-                            unfocusedBorderColor  = TtBorder,
-                            errorBorderColor      = TtOpponentRed,
-                            focusedTextColor      = TtTextPrimary,
-                            unfocusedTextColor    = TtTextPrimary,
-                            cursorColor           = TtBlueLight,
+                            focusedBorderColor       = TtBluePrimary,
+                            unfocusedBorderColor     = TtBorder,
+                            errorBorderColor         = TtOpponentRed,
+                            focusedTextColor         = TtTextPrimary,
+                            unfocusedTextColor       = TtTextPrimary,
+                            cursorColor              = TtBlueLight,
                             focusedContainerColor    = TtBgCard,
                             unfocusedContainerColor  = TtBgCard,
                             errorContainerColor      = TtOpponentRed.copy(alpha = 0.05f)
                         )
                     )
-                    // Missatge d'error
                     AnimatedVisibility(visible = isAliasError) {
                         Text(
                             text = stringResource(R.string.config_alias_error),
@@ -174,30 +174,29 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
                         .fillMaxWidth()
                         .border(1.dp, TtBorder, RoundedCornerShape(6.dp))
                         .background(TtBgSurface.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
-                        .padding(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(0.dp)
+                        .padding(4.dp)
                 ) {
                     ConfigOptionRow(
-                        title    = stringResource(R.string.config_time_title),
-                        subtitle = stringResource(R.string.config_time_sub),
-                        icon     = "⏱",
-                        checked  = isTimeEnabled,
+                        title       = stringResource(R.string.config_time_title),
+                        subtitle    = stringResource(R.string.config_time_sub),
+                        icon        = "⏱",
+                        checked     = isTimeEnabled,
                         onCheckedChange = { isTimeEnabled = it },
                         showDivider = true
                     )
                     ConfigOptionRow(
-                        title    = stringResource(R.string.config_borders_title),
-                        subtitle = stringResource(R.string.config_borders_sub),
-                        icon     = "⊕",
-                        checked  = isBordersMode,
+                        title       = stringResource(R.string.config_borders_title),
+                        subtitle    = stringResource(R.string.config_borders_sub),
+                        icon        = "⊕",
+                        checked     = isBordersMode,
                         onCheckedChange = { isBordersMode = it },
                         showDivider = true
                     )
                     ConfigOptionRow(
-                        title    = stringResource(R.string.config_reverse_title),
-                        subtitle = stringResource(R.string.config_reverse_sub),
-                        icon     = "↕",
-                        checked  = isReverseMode,
+                        title       = stringResource(R.string.config_reverse_title),
+                        subtitle    = stringResource(R.string.config_reverse_sub),
+                        icon        = "↕",
+                        checked     = isReverseMode,
                         onCheckedChange = { isReverseMode = it },
                         showDivider = false
                     )
@@ -212,7 +211,6 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
                 enter = fadeIn(tween(700, 450)) + slideInVertically(tween(700, 450)) { 60 }
             ) {
                 StartButton(
-                    enabled = true,
                     onClick = {
                         if (alias.isNotBlank()) {
                             onStartGame(alias, isTimeEnabled, isBordersMode, isReverseMode)
@@ -250,7 +248,6 @@ fun ConfigOptionRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // Icona
             Box(
                 modifier = Modifier
                     .size(36.dp)
@@ -265,11 +262,17 @@ fun ConfigOptionRow(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = icon, fontSize = 16.sp, color = if (checked) TtBlueLight else TtTextDim)
+                Text(
+                    text = icon,
+                    fontSize = 16.sp,
+                    color = if (checked) TtBlueLight else TtTextDim
+                )
             }
 
-            // Textos
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
                 Text(
                     text = title,
                     fontSize = 13.sp,
@@ -284,17 +287,16 @@ fun ConfigOptionRow(
                 )
             }
 
-            // Switch estilitzat
             Switch(
                 checked = checked,
                 onCheckedChange = onCheckedChange,
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor       = TtTextPrimary,
-                    checkedTrackColor       = TtBluePrimary,
-                    checkedBorderColor      = TtBlueLight.copy(alpha = 0.4f),
-                    uncheckedThumbColor     = TtTextDim,
-                    uncheckedTrackColor     = TtBgDeep,
-                    uncheckedBorderColor    = TtBorder
+                    checkedThumbColor    = TtTextPrimary,
+                    checkedTrackColor    = TtBluePrimary,
+                    checkedBorderColor   = TtBlueLight.copy(alpha = 0.4f),
+                    uncheckedThumbColor  = TtTextDim,
+                    uncheckedTrackColor  = TtBgDeep,
+                    uncheckedBorderColor = TtBorder
                 )
             )
         }
@@ -308,9 +310,9 @@ fun ConfigOptionRow(
     }
 }
 
-// ─── Botó principal de començar ───────────────────────────────────────────────
+// ─── Botó principal ───────────────────────────────────────────────────────────
 @Composable
-fun StartButton(enabled: Boolean, onClick: () -> Unit) {
+fun StartButton(onClick: () -> Unit) {
     val infiniteTransition = rememberInfiniteTransition(label = "btn_glow")
     val glowAlpha by infiniteTransition.animateFloat(
         initialValue = 0.4f, targetValue = 1f,
@@ -331,11 +333,7 @@ fun StartButton(enabled: Boolean, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .scale(scale)
-            .border(
-                width = 1.5.dp,
-                color = TtGold.copy(alpha = glowAlpha),
-                shape = RoundedCornerShape(4.dp)
-            )
+            .border(1.5.dp, TtGold.copy(alpha = glowAlpha), RoundedCornerShape(4.dp))
             .background(TtBluePrimary.copy(alpha = 0.15f), RoundedCornerShape(4.dp))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -348,12 +346,7 @@ fun StartButton(enabled: Boolean, onClick: () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "▶",
-                color = TtGoldLight,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Black
-            )
+            Text("▶", color = TtGoldLight, fontSize = 14.sp, fontWeight = FontWeight.Black)
             Text(
                 text = stringResource(R.string.config_btn_start),
                 fontSize = 14.sp,
