@@ -42,7 +42,8 @@
     <string name="card_legend_bottom">▼ Inferior</string>
 
     <!-- Game Screen -->
-    <string name="game_your_hand">TU MANO</string>
+    <string name="game_opponent_hand">MANO DEL OPONENTE</string>
+    <string name="game_player_hand">TU MANO</string>
     <string name="game_turn_yours">TU TURNO</string>
     <string name="game_turn_opponent">TURNO DEL RIVAL</string>
 

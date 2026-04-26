@@ -52,7 +52,7 @@ class GameActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = TtBgDeep
                 ) {
-                    GameScreen(playerName, GameSettings.DEFAULT_GRID_SIZE, isTimeEnabled, gameViewModel)
+                    GameScreen(playerName, isTimeEnabled, gameViewModel)
 
                     // ── AlertDialog de final de partida ──────────────────────
                     if (gameViewModel.isGameOver) {
@@ -250,7 +250,6 @@ fun ScoreChip(label: String, score: Int, color: Color) {
 @Composable
 fun GameScreen(
     playerName: String,
-    gridSize: Int,
     isTimeEnabled: Boolean,
     viewModel: GameViewModel
 ) {
@@ -264,7 +263,7 @@ fun GameScreen(
     ) {
         Spacer(Modifier.height(8.dp))
 
-        // ── Capçalera ────────────────────────────────────────────────────
+        // Cabecera
         Text(
             text = playerName.uppercase(),
             fontSize = 13.sp,
@@ -273,7 +272,7 @@ fun GameScreen(
             color = TtTextSecondary
         )
 
-        // Temporitzador
+        // Temporizador
         if (isTimeEnabled) {
             Spacer(Modifier.height(4.dp))
             val timeColor = if (viewModel.timeLeft <= 10) TtOpponentRed else TtTextSecondary
@@ -290,7 +289,7 @@ fun GameScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // ── Marcador ─────────────────────────────────────────────────────
+        // Marcador
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -305,7 +304,7 @@ fun GameScreen(
                 Text(text = "${viewModel.playerScore}", fontSize = 28.sp, fontWeight = FontWeight.Black, color = TtPlayerBlue)
                 Text(text = "TU", fontSize = 9.sp, letterSpacing = 2.sp, color = TtTextSecondary)
             }
-            // Torn
+            // Turno
             Box(
                 modifier = Modifier
                     .border(1.dp, TtBorder, RoundedCornerShape(4.dp))
@@ -331,7 +330,42 @@ fun GameScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        // ── Tauler 3x3 ───────────────────────────────────────────────────
+        // Mano del oponente
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.padding(bottom = 4.dp)
+        ) {
+            HorizontalDivider(modifier = Modifier.weight(1f), color = TtOpponentRed.copy(alpha = 0.4f))
+            Text(
+                text = stringResource(id = R.string.game_opponent_hand).uppercase(),
+                fontSize = 9.sp,
+                letterSpacing = 3.sp,
+                color = TtOpponentRed,
+                fontWeight = FontWeight.Bold
+            )
+            HorizontalDivider(modifier = Modifier.weight(1f), color = TtOpponentRed.copy(alpha = 0.4f))
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.padding(bottom = 16.dp)
+        ) {
+            viewModel.opponentHand.forEach { card ->
+                Box(
+                    modifier = Modifier
+                        .border(1.dp, TtBorder.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
+                ) {
+                    CardView(card, color = TtOpponentRed)
+                }
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        // Tablero 3x3
         Box(
             modifier = Modifier
                 .size(300.dp)
@@ -352,14 +386,14 @@ fun GameScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        // ── Mà del jugador ───────────────────────────────────────────────
+        // Mano del jugador
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier.padding(bottom = 4.dp)
         ) {
             HorizontalDivider(modifier = Modifier.weight(1f), color = TtBorder)
-            Text(stringResource(R.string.game_your_hand), fontSize = 9.sp, letterSpacing = 3.sp, color = TtTextDim)
+            Text(stringResource(R.string.game_player_hand), fontSize = 9.sp, letterSpacing = 3.sp, color = TtTextDim)
             HorizontalDivider(modifier = Modifier.weight(1f), color = TtBorder)
         }
 
@@ -388,14 +422,14 @@ fun GameScreen(
                         )
                         .scale(if (isSelected) 1.06f else 1f)
                 ) {
-                    CardView(card)
+                    CardView(card, color = TtPlayerBlue)
                 }
             }
         }
     }
 }
 
-// ─── Cel·la del tauler ────────────────────────────────────────────────────────
+// Celdas del tablero
 @Composable
 fun BoardCell(card: Card?, onClick: () -> Unit) {
     val bgColor = if (card == null) TtBgCard else when (card.owner) {
@@ -427,7 +461,7 @@ fun BoardCell(card: Card?, onClick: () -> Unit) {
     }
 }
 
-// ─── Vista de carta ───────────────────────────────────────────────────────────
+//Vista de carta
 @Composable
 fun CardView(card: Card, color: Color = TtPlayerBlue) {
     Box(
@@ -447,7 +481,9 @@ fun CardView(card: Card, color: Color = TtPlayerBlue) {
             fontWeight = FontWeight.Black,
             fontSize = 12.sp,
             color = color,
-            modifier = Modifier.align(Alignment.TopCenter).padding(top = 4.dp)
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 4.dp)
         )
         // Bottom
         Text(
@@ -455,7 +491,9 @@ fun CardView(card: Card, color: Color = TtPlayerBlue) {
             fontWeight = FontWeight.Black,
             fontSize = 12.sp,
             color = color,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 4.dp)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 4.dp)
         )
         // Left
         Text(
@@ -463,7 +501,9 @@ fun CardView(card: Card, color: Color = TtPlayerBlue) {
             fontWeight = FontWeight.Black,
             fontSize = 12.sp,
             color = color,
-            modifier = Modifier.align(Alignment.CenterStart).padding(start = 4.dp)
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 4.dp)
         )
         // Right
         Text(
@@ -471,7 +511,9 @@ fun CardView(card: Card, color: Color = TtPlayerBlue) {
             fontWeight = FontWeight.Black,
             fontSize = 12.sp,
             color = color,
-            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 4.dp)
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = 4.dp)
         )
         // Centre buit
         Box(

@@ -12,7 +12,7 @@ object IntentKeys {
 
 object GameSettings {
     const val DEFAULT_GRID_SIZE = 3
-    const val DEFAULT_TIME_SECONDS = 60
+    const val DEFAULT_TIME_SECONDS = 120
     const val AI_THINKING_DELAY = 1000L
 }
 

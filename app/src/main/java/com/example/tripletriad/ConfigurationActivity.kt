@@ -2,7 +2,6 @@ package com.example.tripletriad
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -95,7 +94,7 @@ fun ConfiguracionScreen(onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Control de Tiempo (60s)")
+            Text("Control de Tiempo (120s)")
             Switch(checked = isTimeEnabled, onCheckedChange = { isTimeEnabled = it })
         }
 
