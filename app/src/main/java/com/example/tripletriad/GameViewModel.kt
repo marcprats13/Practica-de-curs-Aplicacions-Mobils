@@ -118,7 +118,7 @@ class GameViewModel : ViewModel() {
             updateScores()
             checkGameOver()
 
-            // Si el juego no ha terminado, te devuelve el turno
+            // Si el juego no ha terminado devolvemos el turno
             if (!isGameOver) {
                 isPlayer1Turn = true
             }
@@ -128,7 +128,7 @@ class GameViewModel : ViewModel() {
     private fun checkCaptures(index: Int) {
         val currentCard = board[index] ?: return
 
-        // Matemáticas para el Modo Fronteras (Toroidal) o Tablero Normal
+        // Calculos para los modos frontera y normal
         val topNeighbor = if (isBordersMode && index < 3) index + 6 else index - 3
         val bottomNeighbor = if (isBordersMode && index > 5) index - 6 else index + 3
         val leftNeighbor = if (isBordersMode && index % 3 == 0) index + 2 else index - 1
@@ -145,7 +145,7 @@ class GameViewModel : ViewModel() {
             // Validar que el índice está dentro del tablero
             if (neighborIndex in 0..8) {
 
-                // Si el Modo Fronteras está APAGADO, bloqueamos los saltos de fila
+                // Si el Modo Fronteras está apagado, bloqueamos los saltos de fila
                 if (!isBordersMode) {
                     if (position == "LEFT" && index % 3 == 0) continue
                     if (position == "RIGHT" && index % 3 == 2) continue
@@ -154,7 +154,7 @@ class GameViewModel : ViewModel() {
                 val neighborCard = board[neighborIndex]
                 if (neighborCard != null && neighborCard.owner != currentCard.owner) {
 
-                    // Función auxiliar para saber si ganamos la captura (Normal o Inversa)
+                    // Función auxiliar para saber si ganamos la captura (Depende de modalidad normal o inversa)
                     fun wins(myStat: Int, oppStat: Int): Boolean {
                         return if (isReverseMode) myStat < oppStat else myStat > oppStat
                     }
@@ -191,15 +191,15 @@ class GameViewModel : ViewModel() {
     }
 
     fun startTimer(maxTimeSeconds: Int) {
-        if (timerJob == null) { // Evita que se arranque dos veces al rotar la pantalla
+        if (timerJob == null) { // Evitamos que se arranque dos veces al rotar la pantalla
             timeLeft = maxTimeSeconds
 
             timerJob = viewModelScope.launch { //
                 while (timeLeft > 0 && !isGameOver) {
-                    delay(1000L) // Espera un segundo
+                    delay(GameSettings.AI_THINKING_DELAY) // Espera un segundo
                     timeLeft--
 
-                    // RÚBRICA: "Control de si tiempo agotado"
+                    // "Control de si tiempo agotado"
                     if (timeLeft <= 0) {
                         isGameOver = true
                     }

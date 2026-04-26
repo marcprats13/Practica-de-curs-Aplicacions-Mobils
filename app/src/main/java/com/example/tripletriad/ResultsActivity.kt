@@ -32,11 +32,11 @@ class ResultsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val alias = intent.getStringExtra("EXTRA_NAME") ?: "Invitat"
-        val size  = intent.getIntExtra("EXTRA_SIZE", 3)
-        val time  = intent.getIntExtra("EXTRA_TIME", 0)
-        val p1    = intent.getIntExtra("EXTRA_P1_SCORE", 0)
-        val opp   = intent.getIntExtra("EXTRA_OPP_SCORE", 0)
+        val alias = intent.getStringExtra(IntentKeys.EXTRA_ALIAS) ?: "Invitat"
+        val size  = intent.getIntExtra(IntentKeys.EXTRA_SIZE, GameSettings.DEFAULT_GRID_SIZE)
+        val time  = intent.getIntExtra(IntentKeys.EXTRA_TIME_SPENT, 0)
+        val p1    = intent.getIntExtra(IntentKeys.EXTRA_P1_SCORE, 0)
+        val opp   = intent.getIntExtra(IntentKeys.EXTRA_OPP_SCORE, 0)
 
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
         val now = LocalDateTime.now().format(formatter)
@@ -62,7 +62,7 @@ class ResultsActivity : ComponentActivity() {
                         initialLog  = logResumen,
                         onSend = { email, subject, body ->
                             val intentEmail = Intent(Intent.ACTION_SEND).apply {
-                                type = "message/rfc822"
+                                type = EmailConfig.MIME_TYPE
                                 putExtra(Intent.EXTRA_EMAIL,   arrayOf(email))
                                 putExtra(Intent.EXTRA_SUBJECT, subject)
                                 putExtra(Intent.EXTRA_TEXT,    body)
@@ -96,7 +96,7 @@ fun ResultsScreen(
     onPlayAgain: () -> Unit,
     onExit: () -> Unit
 ) {
-    var emailRecipient by remember { mutableStateOf("user@exemple.com") }
+    var emailRecipient by remember { mutableStateOf(EmailConfig.DEFAULT_RECIPIENT) }
     var emailSubject   by remember { mutableStateOf(dateTime) }
     var logBody        by remember { mutableStateOf(initialLog) }
 

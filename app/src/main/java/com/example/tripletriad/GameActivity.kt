@@ -32,11 +32,11 @@ class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val playerName    = intent.getStringExtra("EXTRA_ALIAS") ?: "Player 1"
-        val gridSize      = intent.getIntExtra("EXTRA_SIZE", 3)
-        val isTimeEnabled = intent.getBooleanExtra("EXTRA_TIME_CONTROL", false)
-        val isBordersMode = intent.getBooleanExtra("EXTRA_BORDERS_MODE", false)
-        val isReverseMode = intent.getBooleanExtra("EXTRA_REVERSE_MODE", false)
+        val playerName    = intent.getStringExtra(IntentKeys.EXTRA_ALIAS) ?: "Player 1"
+        val gridSize      = intent.getIntExtra(IntentKeys.EXTRA_SIZE, 3)
+        val isTimeEnabled = intent.getBooleanExtra(IntentKeys.EXTRA_TIME_CONTROL, false)
+        val isBordersMode = intent.getBooleanExtra(IntentKeys.EXTRA_BORDERS_MODE, false)
+        val isReverseMode = intent.getBooleanExtra(IntentKeys.EXTRA_REVERSE_MODE, false)
 
         setContent {
             TripleTriadTheme {
@@ -45,16 +45,15 @@ class GameActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
 
                     gameViewModel.setGameRules(isBordersMode, isReverseMode)
-                    if (isTimeEnabled) gameViewModel.startTimer(50)
+                    if (isTimeEnabled) gameViewModel.startTimer(GameSettings.DEFAULT_TIME_SECONDS)
                 }
-
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = TtBgDeep
                 ) {
                     GameScreen(playerName, gridSize, isTimeEnabled, gameViewModel)
 
-                    // ── AlertDialog de fi de partida ──────────────────────
+                    // ── AlertDialog de final de partida ──────────────────────
                     if (gameViewModel.isGameOver) {
                         val timeSpent = if (isTimeEnabled) 50 - gameViewModel.timeLeft else 0
                         val outcome = when {
@@ -68,11 +67,11 @@ class GameActivity : ComponentActivity() {
                             opponentScore = gameViewModel.opponentScore,
                             onConfirm     = {
                                 val intent = Intent(this@GameActivity, ResultsActivity::class.java).apply {
-                                    putExtra("EXTRA_NAME",      playerName)
-                                    putExtra("EXTRA_SIZE",      gridSize)
-                                    putExtra("EXTRA_P1_SCORE",  gameViewModel.playerScore)
-                                    putExtra("EXTRA_OPP_SCORE", gameViewModel.opponentScore)
-                                    putExtra("EXTRA_TIME",      timeSpent)
+                                    putExtra(IntentKeys.EXTRA_ALIAS,      playerName)
+                                    putExtra(IntentKeys.EXTRA_SIZE,      3)
+                                    putExtra(IntentKeys.EXTRA_P1_SCORE,  gameViewModel.playerScore)
+                                    putExtra(IntentKeys.EXTRA_OPP_SCORE, gameViewModel.opponentScore)
+                                    putExtra(IntentKeys.EXTRA_TIME_SPENT,      timeSpent)
                                 }
                                 startActivity(intent)
                                 finish()
@@ -85,10 +84,10 @@ class GameActivity : ComponentActivity() {
     }
 }
 
-// ─── Enum resultat ────────────────────────────────────────────────────────────
+// ─── Enum resultado ────────────────────────────────────────────────────────────
 enum class GameOutcome { WIN, LOSE, DRAW }
 
-// ─── AlertDialog estilitzat ───────────────────────────────────────────────────
+// ─── AlertDialog ───────────────────────────────────────────────────
 @Composable
 fun GameOverDialog(
     outcome: GameOutcome,

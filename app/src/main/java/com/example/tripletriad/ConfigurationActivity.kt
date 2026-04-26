@@ -32,11 +32,11 @@ class ConfigurationActivity : ComponentActivity() {
                             // 1. Preparamos el Intent explícito hacia el Juego
                             val intent = Intent(this, GameActivity::class.java).apply {
                                 // 2. Pasamos los datos introducidos
-                                putExtra("EXTRA_ALIAS", alias)
-                                putExtra("EXTRA_SIZE", 3)
-                                putExtra("EXTRA_TIME_CONTROL", isTimeEnabled)
-                                putExtra("EXTRA_BORDERS_MODE", isBorders)
-                                putExtra("EXTRA_REVERSE_MODE", isReverse)
+                                putExtra(IntentKeys.EXTRA_ALIAS, alias)
+                                putExtra(IntentKeys.EXTRA_SIZE, GameSettings.DEFAULT_GRID_SIZE)
+                                putExtra(IntentKeys.EXTRA_TIME_CONTROL, isTimeEnabled)
+                                putExtra(IntentKeys.EXTRA_BORDERS_MODE, isBorders)
+                                putExtra(IntentKeys.EXTRA_REVERSE_MODE, isReverse)
                             }
                             // 3. Iniciamos la actividad
                             startActivity(intent)
