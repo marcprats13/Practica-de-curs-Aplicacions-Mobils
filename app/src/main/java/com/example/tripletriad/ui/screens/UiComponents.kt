@@ -11,9 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.tripletriad.R
 import com.example.tripletriad.ui.theme.*
+import com.example.tripletriad.utils.AnimationConfig
 
 @Composable
 fun MenuBackground() {
@@ -21,7 +24,7 @@ fun MenuBackground() {
     val offset by infiniteTransition.animateFloat(
         initialValue = 0f, targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(8000, easing = LinearEasing),
+            animation = tween(AnimationConfig.DURATION_LONG_2, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
         label = "offset"
@@ -38,7 +41,7 @@ fun MenuBackground() {
     }
 }
 
-fun DrawScope.drawAnimatedGrid(animOffset: Float) {  // <-- extensió de DrawScope
+fun DrawScope.drawAnimatedGrid(animOffset: Float) {
     val spacing = 48f
     val totalCols = (size.width / spacing).toInt() + 2
     val totalRows = (size.height / spacing).toInt() + 2
@@ -70,7 +73,7 @@ fun HorizontalDividerWithDiamonds() {
             color = TtGold.copy(alpha = 0.4f),
             thickness = 1.dp
         )
-        Text(text = "  ◆  ", color = TtGold, fontSize = 10.sp)
+        Text(text = stringResource(R.string.help_section4_icon), color = TtGold, fontSize = 10.sp)
         HorizontalDivider(
             modifier = Modifier.weight(1f),
             color = TtGold.copy(alpha = 0.4f),

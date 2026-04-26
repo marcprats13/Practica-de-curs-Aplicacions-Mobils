@@ -6,8 +6,10 @@
 
     <!-- Main Menu -->
     <string name="menu_new_game">NUEVA PARTIDA</string>
+    <string name="menu_new_game_icon">▶</string>
     <string name="menu_help">AYUDA</string>
     <string name="menu_exit">SALIR</string>
+    <string name="menu_exit_icon">✕</string>
     <string name="menu_title_top">TRIPLE</string>
     <string name="menu_title_bottom">TRIAD</string>
 
@@ -49,8 +51,11 @@
 
     <!-- End Game Dialog -->
     <string name="dialog_win_title">VICTORIA</string>
+    <string name="dialog_win_icon">★</string>
     <string name="dialog_lose_title">DERROTA</string>
+    <string name="dialog_lose_icon">✕</string>
     <string name="dialog_draw_title">EMPATE</string>
+    <string name="dialog_draw_icon">◆</string>
     <string name="dialog_btn_results">VER RESULTADOS</string>
     <string name="dialog_score_format">%1$d — %2$d</string>
 

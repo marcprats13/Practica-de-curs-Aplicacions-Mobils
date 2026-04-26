@@ -26,6 +26,7 @@ import kotlinx.coroutines.delay
 import com.example.tripletriad.utils.IntentKeys
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tripletriad.viewmodel.ConfigurationViewModel
+import com.example.tripletriad.utils.AnimationConfig
 
 class ConfigurationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +64,7 @@ fun ConfiguracionScreen(
     onStartGame: (String, Boolean, Boolean, Boolean) -> Unit) {
 
     var visible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { delay(80); visible = true }
+    LaunchedEffect(Unit) { delay(AnimationConfig.INITIAL_START_DELAY); visible = true }
 
     Box(modifier = Modifier.fillMaxSize()) {
         MenuBackground()
@@ -77,10 +78,10 @@ fun ConfiguracionScreen(
         ) {
             Spacer(Modifier.height(40.dp))
 
-            // ── Capçalera ────────────────────────────────────────────────
+            // Cabecera
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn(tween(700)) + slideInVertically(tween(700, easing = EaseOutCubic)) { -60 }
+                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL)) + slideInVertically(tween(AnimationConfig.DURATION_NORMAL, easing = EaseOutCubic)) { -60 }
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     HorizontalDividerWithDiamonds()
@@ -105,10 +106,10 @@ fun ConfiguracionScreen(
 
             Spacer(Modifier.height(32.dp))
 
-            // ── Camp àlies ────────────────────────────────────────────────
+            // Alias
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn(tween(700, 150)) + slideInHorizontally(tween(700, 150)) { -40 }
+                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_SHORT)) + slideInHorizontally(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_SHORT)) { -40 }
             ) {
                 Column(
                     modifier = Modifier
@@ -167,7 +168,7 @@ fun ConfiguracionScreen(
             // Opciones de juego
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn(tween(700, 300)) + slideInVertically(tween(700, 300)) { 40 }
+                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM)) + slideInVertically(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM)) { 40 }
             ) {
                 Column(
                     modifier = Modifier
@@ -205,10 +206,10 @@ fun ConfiguracionScreen(
 
             Spacer(Modifier.height(32.dp))
 
-            // ── Botó començar ─────────────────────────────────────────────
+            // Botón de comenzar partida
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn(tween(700, 450)) + slideInVertically(tween(700, 450)) { 60 }
+                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_LONG)) + slideInVertically(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_LONG)) { 60 }
             ) {
                 StartButton(
                     onClick = {
@@ -226,7 +227,7 @@ fun ConfiguracionScreen(
     }
 }
 
-// ─── Fila d'opció amb Switch ──────────────────────────────────────────────────
+// Para las filas de opciones de juego
 @Composable
 fun ConfigOptionRow(
     title: String,
@@ -310,14 +311,14 @@ fun ConfigOptionRow(
     }
 }
 
-// ─── Botó principal ───────────────────────────────────────────────────────────
+// Botón principal
 @Composable
 fun StartButton(onClick: () -> Unit) {
     val infiniteTransition = rememberInfiniteTransition(label = "btn_glow")
     val glowAlpha by infiniteTransition.animateFloat(
         initialValue = 0.4f, targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            tween(1800, easing = EaseInOutSine), RepeatMode.Reverse
+            tween(AnimationConfig.DURATION_LONG, easing = EaseInOutSine), RepeatMode.Reverse
         ), label = "glow"
     )
 

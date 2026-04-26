@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.*
 import com.example.tripletriad.R
 import com.example.tripletriad.ui.theme.*
 import kotlinx.coroutines.delay
+import com.example.tripletriad.utils.AnimationConfig
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,13 +51,13 @@ fun MainMenuScreen(
     onExit: () -> Unit
 ) {
     var visible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { delay(100); visible = true }
+    LaunchedEffect(Unit) { delay(AnimationConfig.INITIAL_START_DELAY); visible = true }
 
     val infiniteTransition = rememberInfiniteTransition(label = "title_pulse")
     val glowAlpha by infiniteTransition.animateFloat(
         initialValue = 0.4f, targetValue = 0.9f,
         animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = EaseInOutSine),
+            animation = tween(AnimationConfig.DURATION_LONG, easing = EaseInOutSine),
             repeatMode = RepeatMode.Reverse
         ), label = "glow"
     )
@@ -74,7 +75,8 @@ fun MainMenuScreen(
         ) {
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn(tween(800)) + slideInVertically(tween(800, easing = EaseOutCubic)) { -80 }
+                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL)) + slideInVertically(tween(
+                    AnimationConfig.DURATION_NORMAL, easing = EaseOutCubic)) { -80 }
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     HorizontalDividerWithDiamonds()
@@ -108,16 +110,16 @@ fun MainMenuScreen(
 
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn(tween(800, delayMillis = 300)) +
-                        slideInVertically(tween(800, delayMillis = 300, easing = EaseOutCubic)) { 60 }
+                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM)) +
+                        slideInVertically(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM, easing = EaseOutCubic)) { 60 }
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    MenuButton(label = stringResource(R.string.menu_new_game), icon = "▶", isPrimary = true,  onClick = onStartGame)
+                    MenuButton(label = stringResource(R.string.menu_new_game), icon = stringResource(R.string.menu_new_game_icon), isPrimary = true,  onClick = onStartGame)
                     MenuButton(label = stringResource(R.string.menu_help),     icon = "?", isPrimary = false, onClick = onHelp)
-                    MenuButton(label = stringResource(R.string.menu_exit),     icon = "✕", isPrimary = false, onClick = onExit)
+                    MenuButton(label = stringResource(R.string.menu_exit),     icon = stringResource(R.string.menu_exit_icon), isPrimary = false, onClick = onExit)
                 }
             }
 
@@ -125,20 +127,20 @@ fun MainMenuScreen(
 
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn(tween(1000, delayMillis = 600))
+                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_LONG))
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    repeat(3) { i -> MiniCardDecoration(delay = i * 150) }
+                    repeat(3) { i -> MiniCardDecoration(delay = i * AnimationConfig.DELAY_SHORT) }
                 }
             }
         }
     }
 }
 
-// ─── Botó de menú ─────────────────────────────────────────────────────────────
+// Botón de mení
 @Composable
 fun MenuButton(label: String, icon: String, isPrimary: Boolean, onClick: () -> Unit) {
     var pressed by remember { mutableStateOf(false) }
@@ -174,14 +176,14 @@ fun MenuButton(label: String, icon: String, isPrimary: Boolean, onClick: () -> U
     LaunchedEffect(pressed) { if (pressed) { delay(150); pressed = false } }
 }
 
-// ─── Mini carta decorativa ────────────────────────────────────────────────────
+// Mini Cartas decorativas de abajo
 @Composable
 fun MiniCardDecoration(delay: Int = 0) {
     val infiniteTransition = rememberInfiniteTransition(label = "card_float")
     val offsetY by infiniteTransition.animateFloat(
         initialValue = 0f, targetValue = -6f,
         animationSpec = infiniteRepeatable(
-            animation = tween(2000 + delay, easing = EaseInOutSine),
+            animation = tween(AnimationConfig.DURATION_LONG + delay, easing = EaseInOutSine),
             repeatMode = RepeatMode.Reverse
         ), label = "float"
     )

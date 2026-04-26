@@ -23,6 +23,7 @@ import com.example.tripletriad.model.Player
 import com.example.tripletriad.R
 import com.example.tripletriad.ui.theme.*
 import kotlinx.coroutines.delay
+import com.example.tripletriad.utils.AnimationConfig
 
 class HelpActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,21 +58,22 @@ fun helpSections(): List<HelpSection> = listOf(
 @Composable
 fun HelpScreen(onBack: () -> Unit) {
     var visible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { delay(80); visible = true }
+    LaunchedEffect(Unit) { delay(AnimationConfig.INITIAL_START_DELAY); visible = true }
 
     Box(modifier = Modifier.fillMaxSize()) {
         MenuBackground()
 
         Column(modifier = Modifier.fillMaxSize()) {
-            // ── Capçalera ────────────────────────────────────────────────
+            // Cabecera
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn(tween(600)) + slideInVertically(tween(600)) { -60 }
+                enter = fadeIn(tween(AnimationConfig.DURATION_FAST)) + slideInVertically(tween(
+                    AnimationConfig.DURATION_FAST)) { -60 }
             ) {
                 HelpHeader(onBack = onBack)
             }
 
-            // ── Contingut ────────────────────────────────────────────────
+            // Contenido
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -81,14 +83,15 @@ fun HelpScreen(onBack: () -> Unit) {
             ) {
                 AnimatedVisibility(
                     visible = visible,
-                    enter = fadeIn(tween(700, delayMillis = 200))
+                    enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_SHORT))
                 ) { CardDemoSection() }
 
                 helpSections().forEachIndexed { index, section ->
                     AnimatedVisibility(
                         visible = visible,
-                        enter = fadeIn(tween(600, delayMillis = 200 + index * 100)) +
-                                slideInHorizontally(tween(600, delayMillis = 200 + index * 100)) { 40 }
+                        enter = fadeIn(tween(AnimationConfig.DURATION_FAST, AnimationConfig.DELAY_SHORT + index * 100)) +
+                                slideInHorizontally(tween(AnimationConfig.DURATION_FAST,
+                                    AnimationConfig.DELAY_SHORT + index * 100)) { 40 }
                     ) { HelpSectionCard(section = section) }
                 }
 

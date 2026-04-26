@@ -57,7 +57,7 @@ class GameActivity : ComponentActivity() {
                 ) {
                     GameScreen(playerName, isTimeEnabled, gameViewModel)
 
-                    // ── AlertDialog de final de partida ──────────────────────
+                    // AlertDialog de final de partida
                     if (gameViewModel.isGameOver) {
                         val timeSpent =
                             if (isTimeEnabled) {
@@ -94,10 +94,10 @@ class GameActivity : ComponentActivity() {
     }
 }
 
-// ─── Enum resultado ────────────────────────────────────────────────────────────
+// Enum resultado
 enum class GameOutcome { WIN, LOSE, DRAW }
 
-// ─── AlertDialog ───────────────────────────────────────────────────
+// AlertDialog
 @Composable
 fun GameOverDialog(
     outcome: GameOutcome,
@@ -116,12 +116,12 @@ fun GameOverDialog(
         GameOutcome.DRAW -> R.string.dialog_draw_title
     }
     val icon = when (outcome) {
-        GameOutcome.WIN  -> "★"
-        GameOutcome.LOSE -> "✕"
-        GameOutcome.DRAW -> "◆"
+        GameOutcome.WIN  -> R.string.dialog_win_icon
+        GameOutcome.LOSE -> R.string.dialog_lose_icon
+        GameOutcome.DRAW -> R.string.dialog_draw_icon
     }
 
-    // Animació d'entrada
+    // Animacion de entrada
     val infiniteTransition = rememberInfiniteTransition(label = "dialog_glow")
     val glowAlpha by infiniteTransition.animateFloat(
         initialValue = 0.3f, targetValue = 0.8f,
@@ -130,7 +130,7 @@ fun GameOverDialog(
         ), label = "glow"
     )
 
-    // Overlay fosc
+    // Overlay oscuro
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -156,9 +156,9 @@ fun GameOverDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Icona gran
+                // Icono grande
                 Text(
-                    text = icon,
+                    text = stringResource(icon),
                     fontSize = 40.sp,
                     color = accentColor,
                     style = LocalTextStyle.current.copy(
@@ -166,7 +166,7 @@ fun GameOverDialog(
                     )
                 )
 
-                // Títol
+                // Título
                 Text(
                     text = stringResource(titleRes),
                     fontSize = 28.sp,
@@ -179,7 +179,6 @@ fun GameOverDialog(
                     )
                 )
 
-                // Divider
                 HorizontalDivider(color = TtBorder, thickness = 1.dp)
 
                 // Marcador
@@ -195,7 +194,7 @@ fun GameOverDialog(
 
                 HorizontalDivider(color = TtBorder, thickness = 1.dp)
 
-                // Botó confirmar
+                // Botón de confirmar
                 var pressed by remember { mutableStateOf(false) }
                 val scale by animateFloatAsState(
                     targetValue = if (pressed) 0.96f else 1f,
@@ -464,7 +463,7 @@ fun BoardCell(card: Card?, onClick: () -> Unit) {
     }
 }
 
-//Vista de carta
+//Vista de cartas
 @Composable
 fun CardView(card: Card, color: Color = TtPlayerBlue) {
     Box(
@@ -518,7 +517,7 @@ fun CardView(card: Card, color: Color = TtPlayerBlue) {
                 .align(Alignment.CenterEnd)
                 .padding(end = 4.dp)
         )
-        // Centre buit
+        // Centro vacio
         Box(
             modifier = Modifier
                 .size(16.dp)

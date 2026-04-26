@@ -20,3 +20,15 @@ object EmailConfig {
     const val MIME_TYPE = "message/rfc822"
     const val DEFAULT_RECIPIENT = "user@example.com"
 }
+
+object AnimationConfig {
+    const val DURATION_NORMAL = 800
+    const val DURATION_FAST = 600
+    const val DURATION_LONG = 1800
+    const val DURATION_LONG_2 = 8000
+    const val DELAY_SHORT = 150
+    const val DELAY_MEDIUM = 300
+    const val DELAY_LONG = 500
+    const val DELAY_LONG_2 = 650
+    const val INITIAL_START_DELAY = 80L
+}

@@ -34,6 +34,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import com.example.tripletriad.viewmodel.ResultsViewModel
 import com.example.tripletriad.utils.IntentKeys
+import com.example.tripletriad.utils.AnimationConfig
 
 class ResultsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,7 +103,7 @@ class ResultsActivity : ComponentActivity() {
     }
 }
 
-// ─── Results Screen ───────────────────────────────────────────────────────────
+// Results Screen
 @Composable
 fun ResultsScreen(
     playerName: String,
@@ -145,7 +146,7 @@ fun ResultsScreen(
         ), label = "glow"
     )
 
-    // Animació d'entrada
+    // Animación de entrada
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
 
@@ -162,8 +163,9 @@ fun ResultsScreen(
         ) {
             Spacer(Modifier.height(24.dp))
 
-            // ── Capçalera títol ──────────────────────────────────────────
-            AnimatedVisibility(visible, enter = fadeIn(tween(700)) + slideInVertically(tween(700)) { -60 }) {
+            // Titulo
+            AnimatedVisibility(visible, enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL)) + slideInVertically(tween(
+                AnimationConfig.DURATION_NORMAL)) { -60 }) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     HorizontalDividerWithDiamonds()
                     Spacer(Modifier.height(16.dp))
@@ -186,7 +188,8 @@ fun ResultsScreen(
             }
 
             // ── Bloc resultat ─────────────────────────────────────────────
-            AnimatedVisibility(visible, enter = fadeIn(tween(700, 200)) + scaleIn(tween(700, 200))) {
+            AnimatedVisibility(visible, enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL,
+                AnimationConfig.DELAY_SHORT)) + scaleIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_SHORT))) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -205,7 +208,7 @@ fun ResultsScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        // Icona i resultat
+                        // Icono y resultado
                         Text(
                             text = outcomeIcon,
                             fontSize = 36.sp,
@@ -255,8 +258,10 @@ fun ResultsScreen(
                 }
             }
 
-            // ── Estadístiques ─────────────────────────────────────────────
-            AnimatedVisibility(visible, enter = fadeIn(tween(700, 350)) + slideInVertically(tween(700, 350)) { 40 }) {
+            // Estadísticas
+            AnimatedVisibility(visible, enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL,
+                AnimationConfig.DELAY_MEDIUM)) + slideInVertically(tween(AnimationConfig.DURATION_NORMAL,
+                AnimationConfig.DELAY_MEDIUM)) { 40 }) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -279,8 +284,9 @@ fun ResultsScreen(
                 }
             }
 
-            // ── Log editable ──────────────────────────────────────────────
-            AnimatedVisibility(visible, enter = fadeIn(tween(700, 500))) {
+            //Log Editable
+            AnimatedVisibility(visible, enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL,
+                AnimationConfig.DELAY_LONG))) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -303,7 +309,7 @@ fun ResultsScreen(
                         label = stringResource(R.string.results_email_label),
                         modifier = Modifier.focusRequester(focusRequester)
                     )
-                    // Assumpte
+                    // Asunto
                     TtOutlinedField(
                         value = viewModel.emailSubject,
                         onValueChange = { viewModel.emailSubject = it },
@@ -318,7 +324,7 @@ fun ResultsScreen(
                         singleLine = false
                     )
 
-                    // Botó enviar
+                    // Botón de enviar
                     TtButton(
                         label = stringResource(R.string.results_btn_send),
                         color = TtGold,
@@ -327,8 +333,10 @@ fun ResultsScreen(
                 }
             }
 
-            // ── Botons finals ─────────────────────────────────────────────
-            AnimatedVisibility(visible, enter = fadeIn(tween(700, 650)) + slideInVertically(tween(700, 650)) { 40 }) {
+            // Botones finales de nueva partida y salir
+            AnimatedVisibility(visible, enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL,
+                AnimationConfig.DELAY_LONG_2)) + slideInVertically(tween(AnimationConfig.DURATION_NORMAL,
+                AnimationConfig.DELAY_LONG_2)) { 40 }) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -353,7 +361,7 @@ fun ResultsScreen(
     }
 }
 
-// ─── Components reutilitzables ────────────────────────────────────────────────
+// Components reutilitzables
 @Composable
 fun StatRow(label: String, value: String) {
     Row(
