@@ -34,7 +34,7 @@ fun MenuBackground() {
                 radius = size.height * 0.75f
             )
         )
-        drawAnimatedGrid(offset)  // <-- sense "this"
+        drawAnimatedGrid(offset)
     }
 }
 
