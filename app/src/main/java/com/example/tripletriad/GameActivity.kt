@@ -41,8 +41,6 @@ class GameActivity : ComponentActivity() {
             TripleTriadTheme {
                 val gameViewModel: GameViewModel = viewModel()
 
-                val startTime = remember { System.currentTimeMillis() }
-
                 LaunchedEffect(Unit) {
 
                     gameViewModel.setGameRules(isBordersMode, isReverseMode)
@@ -60,7 +58,7 @@ class GameActivity : ComponentActivity() {
                             if (isTimeEnabled) {
                                 GameSettings.DEFAULT_TIME_SECONDS - gameViewModel.timeLeft
                             } else {
-                                ((System.currentTimeMillis() - startTime) / 1000).toInt()
+                                ((System.currentTimeMillis() - gameViewModel.gameStartTime) / 1000).toInt()
                             }
                         val outcome = when {
                             gameViewModel.playerScore > gameViewModel.opponentScore -> GameOutcome.WIN

@@ -125,7 +125,7 @@ fun ResultsScreen(
         GameOutcome.DRAW -> "◆"
     }
 
-    // Glow animat
+    // Glow animado
     val infiniteTransition = rememberInfiniteTransition(label = "res_glow")
     val glowAlpha by infiniteTransition.animateFloat(
         initialValue = 0.3f, targetValue = 0.8f,

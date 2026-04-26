@@ -19,6 +19,8 @@ class GameViewModel : ViewModel() {
         repeat(9) { add(null) }
     }
 
+    val gameStartTime = System.currentTimeMillis()
+
     // Game State
     var isPlayer1Turn by mutableStateOf(Random.nextBoolean())
 
