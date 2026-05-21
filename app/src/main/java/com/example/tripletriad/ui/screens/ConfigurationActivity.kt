@@ -88,7 +88,7 @@ fun ConfiguracionScreen(
                     Spacer(Modifier.height(16.dp))
                     Text(
                         text = stringResource(R.string.config_title),
-                        fontSize = 32.sp,
+                        fontSize = 28.sp,
                         fontWeight = FontWeight.Black,
                         letterSpacing = 8.sp,
                         color = TtTextPrimary
@@ -133,8 +133,7 @@ fun ConfiguracionScreen(
                     OutlinedTextField(
                         value = viewModel.alias,
                         onValueChange = {
-                            viewModel.alias = it
-                            if (it.isNotBlank()) viewModel.isAliasError = false
+                            viewModel.updateAlias(it)
                         },
                         placeholder = { Text("ex: Jugador", color = TtTextDim, fontSize = 14.sp) },
                         singleLine = true,
@@ -182,7 +181,7 @@ fun ConfiguracionScreen(
                         subtitle    = stringResource(R.string.config_time_sub),
                         icon        = "⏱",
                         checked     = viewModel.isTimeEnabled,
-                        onCheckedChange = { viewModel.isTimeEnabled = it },
+                        onCheckedChange = { viewModel.setTimeEnabled(it) },
                         showDivider = true
                     )
                     ConfigOptionRow(
@@ -190,7 +189,7 @@ fun ConfiguracionScreen(
                         subtitle    = stringResource(R.string.config_borders_sub),
                         icon        = "⊕",
                         checked     = viewModel.isBordersMode,
-                        onCheckedChange = { viewModel.isBordersMode = it },
+                        onCheckedChange = { viewModel.setBordersMode(it) },
                         showDivider = true
                     )
                     ConfigOptionRow(
@@ -198,7 +197,7 @@ fun ConfiguracionScreen(
                         subtitle    = stringResource(R.string.config_reverse_sub),
                         icon        = "↕",
                         checked     = viewModel.isReverseMode,
-                        onCheckedChange = { viewModel.isReverseMode = it },
+                        onCheckedChange = { viewModel.setReverseMode(it) },
                         showDivider = false
                     )
                 }
@@ -216,7 +215,7 @@ fun ConfiguracionScreen(
                         if (viewModel.alias.isNotBlank()) {
                             onStartGame(viewModel.alias, viewModel.isTimeEnabled, viewModel.isBordersMode, viewModel.isReverseMode)
                         } else {
-                            viewModel.isAliasError = true
+                            viewModel.setAliasError(true)
                         }
                     }
                 )

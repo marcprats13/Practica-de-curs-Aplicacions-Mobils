@@ -305,20 +305,20 @@ fun ResultsScreen(
                     // Email
                     TtOutlinedField(
                         value = viewModel.emailRecipient,
-                        onValueChange = { viewModel.emailRecipient = it },
+                        onValueChange = { viewModel.updateRecipient(it) },
                         label = stringResource(R.string.results_email_label),
                         modifier = Modifier.focusRequester(focusRequester)
                     )
                     // Asunto
                     TtOutlinedField(
                         value = viewModel.emailSubject,
-                        onValueChange = { viewModel.emailSubject = it },
+                        onValueChange = { viewModel.updateSubject(it) },
                         label = stringResource(R.string.results_subject_label)
                     )
                     // Log
                     TtOutlinedField(
                         value = viewModel.logBody,
-                        onValueChange = { viewModel.logBody = it },
+                        onValueChange = { viewModel.updateLogBody(it) },
                         label = "Log",
                         modifier = Modifier.height(150.dp),
                         singleLine = false

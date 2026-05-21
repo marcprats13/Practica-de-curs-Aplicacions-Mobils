@@ -26,6 +26,7 @@ class GameViewModel : ViewModel() {
 
     // Game State
     var isPlayer1Turn by mutableStateOf(Random.Default.nextBoolean())
+        private set
 
     init {
         // Si la máquina gana el sorteo inicial, empieza ella
@@ -37,7 +38,9 @@ class GameViewModel : ViewModel() {
         }
     }
     var playerScore by mutableIntStateOf(5) // Empezamos con 5 cartas
+        private set
     var opponentScore by mutableIntStateOf(5)
+        private set
 
     var isGameOver by mutableStateOf(false)
         private set
@@ -47,8 +50,10 @@ class GameViewModel : ViewModel() {
     var timeLeft by mutableIntStateOf(25) // Por defecto 25, pero lo cambiaremos
         private set
 
-    var isBordersMode = false
-    var isReverseMode = false
+    var isBordersMode by mutableStateOf(false)
+        private set
+    var isReverseMode by mutableStateOf(false)
+        private set
     // Objeto clásico de Android para contar hacia atrás
     private var timerJob: Job? = null
 
