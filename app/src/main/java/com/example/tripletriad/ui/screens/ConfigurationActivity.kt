@@ -181,7 +181,7 @@ fun ConfiguracionScreen(
                         subtitle    = stringResource(R.string.config_time_sub),
                         icon        = "⏱",
                         checked     = viewModel.isTimeEnabled,
-                        onCheckedChange = { viewModel.setTimeEnabled(it) },
+                        onCheckedChange = { viewModel.updateTimeEnabled(it) },
                         showDivider = true
                     )
                     ConfigOptionRow(
@@ -189,7 +189,7 @@ fun ConfiguracionScreen(
                         subtitle    = stringResource(R.string.config_borders_sub),
                         icon        = "⊕",
                         checked     = viewModel.isBordersMode,
-                        onCheckedChange = { viewModel.setBordersMode(it) },
+                        onCheckedChange = { viewModel.updateBordersMode(it) },
                         showDivider = true
                     )
                     ConfigOptionRow(
@@ -197,7 +197,7 @@ fun ConfiguracionScreen(
                         subtitle    = stringResource(R.string.config_reverse_sub),
                         icon        = "↕",
                         checked     = viewModel.isReverseMode,
-                        onCheckedChange = { viewModel.setReverseMode(it) },
+                        onCheckedChange = { viewModel.updateReverseMode(it) },
                         showDivider = false
                     )
                 }
@@ -215,7 +215,7 @@ fun ConfiguracionScreen(
                         if (viewModel.alias.isNotBlank()) {
                             onStartGame(viewModel.alias, viewModel.isTimeEnabled, viewModel.isBordersMode, viewModel.isReverseMode)
                         } else {
-                            viewModel.setAliasError(true)
+                            viewModel.showAliasError(true)
                         }
                     }
                 )

@@ -14,6 +14,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
+import com.example.tripletriad.model.GameEndReason
 
 class GameViewModel : ViewModel() {
 
@@ -43,6 +44,9 @@ class GameViewModel : ViewModel() {
         private set
 
     var isGameOver by mutableStateOf(false)
+        private set
+
+    var endReason by mutableStateOf(GameEndReason.NONE)
         private set
 
     var selectedCard by mutableStateOf<Card?>(null)
@@ -266,6 +270,7 @@ class GameViewModel : ViewModel() {
 
                     // Control de si el tiempo esta agotado
                     if (timeLeft <= 0) {
+                        endReason = GameEndReason.TIME_OUT
                         isGameOver = true
                     }
                 }
@@ -279,6 +284,7 @@ class GameViewModel : ViewModel() {
     fun checkGameOver() {
         // El juego termina si no quedan huecos en el tablero
         if (board.all { it != null }) {
+            endReason = GameEndReason.BOARD_FULL
             isGameOver = true
             stopTimer()
         }

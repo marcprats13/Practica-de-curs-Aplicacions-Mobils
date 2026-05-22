@@ -21,16 +21,16 @@ class ConfigurationViewModel : ViewModel() {
         alias = value
         if (value.isNotBlank()) isAliasError = false
     }
-    fun setTimeEnabled(value: Boolean)  {
+    fun updateTimeEnabled(value: Boolean)  {
         isTimeEnabled = value
     }
-    fun setBordersMode(value: Boolean)  {
+    fun updateBordersMode(value: Boolean)  {
         isBordersMode = value
     }
-    fun setReverseMode(value: Boolean)  {
+    fun updateReverseMode(value: Boolean)  {
         isReverseMode = value
     }
-    fun setAliasError(value: Boolean)   {
+    fun showAliasError(value: Boolean)   {
         isAliasError = value
     }
 }

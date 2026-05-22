@@ -29,6 +29,7 @@ import com.example.tripletriad.utils.GameSettings
 import com.example.tripletriad.viewmodel.GameViewModel
 import com.example.tripletriad.model.Player
 import com.example.tripletriad.R
+import com.example.tripletriad.model.GameEndReason
 import com.example.tripletriad.ui.theme.*
 import kotlinx.coroutines.delay
 import com.example.tripletriad.utils.IntentKeys
@@ -65,13 +66,16 @@ class GameActivity : ComponentActivity() {
                             } else {
                                 ((System.currentTimeMillis() - gameViewModel.gameStartTime) / 1000).toInt()
                             }
+                        val timedOut = gameViewModel.endReason == GameEndReason.TIME_OUT
                         val outcome = when {
+                            timedOut -> GameOutcome.LOSE
                             gameViewModel.playerScore > gameViewModel.opponentScore -> GameOutcome.WIN
                             gameViewModel.playerScore < gameViewModel.opponentScore -> GameOutcome.LOSE
                             else -> GameOutcome.DRAW
                         }
                         GameOverDialog(
                             outcome       = outcome,
+                            timedOut      = timedOut,
                             playerScore   = gameViewModel.playerScore,
                             opponentScore = gameViewModel.opponentScore,
                             onConfirm     = {
@@ -82,6 +86,7 @@ class GameActivity : ComponentActivity() {
                                     putExtra(IntentKeys.EXTRA_TIME_SPENT,      timeSpent)
                                     putExtra(IntentKeys.EXTRA_BORDERS_MODE, isBordersMode)
                                     putExtra(IntentKeys.EXTRA_REVERSE_MODE, isReverseMode)
+                                    putExtra(IntentKeys.EXTRA_TIME_OUT, timedOut)
                                 }
                                 startActivity(intent)
                                 finish()
@@ -101,6 +106,7 @@ enum class GameOutcome { WIN, LOSE, DRAW }
 @Composable
 fun GameOverDialog(
     outcome: GameOutcome,
+    timedOut: Boolean,
     playerScore: Int,
     opponentScore: Int,
     onConfirm: () -> Unit
@@ -110,10 +116,11 @@ fun GameOverDialog(
         GameOutcome.LOSE -> TtOpponentRed
         GameOutcome.DRAW -> TtBlueLight
     }
-    val titleRes = when (outcome) {
-        GameOutcome.WIN  -> R.string.dialog_win_title
-        GameOutcome.LOSE -> R.string.dialog_lose_title
-        GameOutcome.DRAW -> R.string.dialog_draw_title
+    val titleRes = when {
+        timedOut -> R.string.dialog_timeout_title
+        outcome == GameOutcome.WIN  -> R.string.dialog_win_title
+        outcome == GameOutcome.LOSE -> R.string.dialog_lose_title
+        else -> R.string.dialog_draw_title
     }
     val icon = when (outcome) {
         GameOutcome.WIN  -> R.string.dialog_win_icon

@@ -46,6 +46,7 @@ class ResultsActivity : ComponentActivity() {
         val opp   = intent.getIntExtra(IntentKeys.EXTRA_OPP_SCORE, 0)
         val borders = intent.getBooleanExtra(IntentKeys.EXTRA_BORDERS_MODE, false)
         val reverse = intent.getBooleanExtra(IntentKeys.EXTRA_REVERSE_MODE, false)
+        val timedOut = intent.getBooleanExtra(IntentKeys.EXTRA_TIME_OUT, false)
 
         val size = GameSettings.DEFAULT_GRID_SIZE
 
@@ -57,7 +58,13 @@ class ResultsActivity : ComponentActivity() {
             Alias: $alias
             Mida Parrilla: ${size}x${size}
             Tiempo empleado: $time segundos
-            Resultado: ${if (p1 > opp) "Victoria" else "Derrorta"} ($p1 - $opp)
+            Resultado: ${
+                when {
+                    timedOut -> "Derrota (tiempo agotado)"
+                    p1 > opp -> "Victoria"
+                    p1 < opp -> "Derrota"
+                    else -> "Empate"
+                } } ($p1 - $opp)
             Finalizado el: $now
             Modo Fronteras: ${if (borders) "Activado" else "Desactivado"}
             Modo Inverso: ${if (reverse) "Activado" else "Desactivado"}
@@ -80,6 +87,7 @@ class ResultsActivity : ComponentActivity() {
                         p1Score     = p1,
                         oppScore    = opp,
                         dateTime    = now,
+                        timedOut    = timedOut,
                         viewModel   = viewModel,
                         onSend = { email, subject, body ->
                             val intentEmail = Intent(Intent.ACTION_SEND).apply {
@@ -112,6 +120,7 @@ fun ResultsScreen(
     p1Score: Int,
     oppScore: Int,
     dateTime: String,
+    timedOut: Boolean,
     viewModel: ResultsViewModel,
     onSend: (String, String, String) -> Unit,
     onPlayAgain: () -> Unit,
@@ -122,9 +131,10 @@ fun ResultsScreen(
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 
     val outcome = when {
+        timedOut -> GameOutcome.LOSE
         p1Score > oppScore -> GameOutcome.WIN
         p1Score < oppScore -> GameOutcome.LOSE
-        else               -> GameOutcome.DRAW
+        else -> GameOutcome.DRAW
     }
     val accentColor = when (outcome) {
         GameOutcome.WIN  -> TtGoldLight
@@ -219,10 +229,11 @@ fun ResultsScreen(
                         )
                         Text(
                             text = stringResource(
-                                when (outcome) {
-                                    GameOutcome.WIN  -> R.string.results_win
-                                    GameOutcome.LOSE -> R.string.results_lose
-                                    GameOutcome.DRAW -> R.string.results_draw
+                                when {
+                                    timedOut -> R.string.results_timeout
+                                    outcome == GameOutcome.WIN  -> R.string.results_win
+                                    outcome == GameOutcome.LOSE -> R.string.results_lose
+                                    else -> R.string.results_draw
                                 }
                             ),
                             fontSize = 22.sp,

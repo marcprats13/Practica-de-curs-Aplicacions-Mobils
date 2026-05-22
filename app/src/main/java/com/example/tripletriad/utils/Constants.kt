@@ -8,6 +8,7 @@ object IntentKeys {
     const val EXTRA_P1_SCORE = "EXTRA_P1_SCORE"
     const val EXTRA_OPP_SCORE = "EXTRA_OPP_SCORE"
     const val EXTRA_TIME_SPENT = "EXTRA_TIME_SPENT"
+    const val EXTRA_TIME_OUT = "EXTRA_TIME_OUT"
 }
 
 object GameSettings {
