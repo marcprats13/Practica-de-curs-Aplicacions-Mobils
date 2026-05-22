@@ -212,10 +212,8 @@ fun ConfiguracionScreen(
             ) {
                 StartButton(
                     onClick = {
-                        if (viewModel.alias.isNotBlank()) {
+                        if (viewModel.isConfigValid()) {
                             onStartGame(viewModel.alias, viewModel.isTimeEnabled, viewModel.isBordersMode, viewModel.isReverseMode)
-                        } else {
-                            viewModel.showAliasError(true)
                         }
                     }
                 )
