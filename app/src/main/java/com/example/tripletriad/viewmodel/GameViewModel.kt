@@ -8,13 +8,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tripletriad.model.Card
+import com.example.tripletriad.model.GameEndReason
 import com.example.tripletriad.utils.GameSettings
 import com.example.tripletriad.model.Player
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
-import com.example.tripletriad.model.GameEndReason
 
 class GameViewModel : ViewModel() {
 
