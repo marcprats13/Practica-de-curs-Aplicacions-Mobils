@@ -1,6 +1,7 @@
 package com.example.tripletriad.ui.screens
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
@@ -50,6 +52,8 @@ fun MainMenuScreen(
     onStartGame: () -> Unit,
     onExit: () -> Unit
 ) {
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { delay(AnimationConfig.INITIAL_START_DELAY); visible = true }
 
@@ -62,48 +66,47 @@ fun MainMenuScreen(
         ), label = "glow"
     )
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        MenuBackground()
-
+    if (isLandscape) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 32.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(32.dp)
+        ) {
+            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL)) +
+                            slideInHorizontally(tween(AnimationConfig.DURATION_NORMAL, easing = EaseOutCubic)) { -80 }
+                ) {
+                    MenuTitle(glowAlpha)
+                }
+            }
+            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM)) +
+                            slideInHorizontally(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM, easing = EaseOutCubic)) { 80 }
+                ) {
+                    MenuButtons(onStartGame, onHelp, onExit)
+                }
+            }
+        }
+    } else {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 32.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL)) + slideInVertically(tween(
-                    AnimationConfig.DURATION_NORMAL, easing = EaseOutCubic)) { -80 }
+                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL)) +
+                        slideInVertically(tween(AnimationConfig.DURATION_NORMAL, easing = EaseOutCubic)) { -80 }
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    HorizontalDividerWithDiamonds()
-                    Spacer(Modifier.height(24.dp))
-                    Text(
-                        text = stringResource(R.string.menu_title_top),
-                        fontSize = 48.sp,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 12.sp,
-                        color = TtTextPrimary,
-                        style = LocalTextStyle.current.copy(
-                            shadow = Shadow(color = TtBluePrimary.copy(alpha = glowAlpha), blurRadius = 24f)
-                        )
-                    )
-                    Text(
-                        text = stringResource(R.string.menu_title_bottom),
-                        fontSize = 48.sp,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 12.sp,
-                        color = TtGoldLight,
-                        style = LocalTextStyle.current.copy(
-                            shadow = Shadow(color = TtGold.copy(alpha = glowAlpha), blurRadius = 28f)
-                        )
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    HorizontalDividerWithDiamonds()
-                }
+                MenuTitle(glowAlpha)
             }
 
             Spacer(Modifier.height(56.dp))
@@ -113,14 +116,7 @@ fun MainMenuScreen(
                 enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM)) +
                         slideInVertically(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM, easing = EaseOutCubic)) { 60 }
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    MenuButton(label = stringResource(R.string.menu_new_game), icon = stringResource(R.string.menu_new_game_icon), isPrimary = true,  onClick = onStartGame)
-                    MenuButton(label = stringResource(R.string.menu_help),     icon = "?", isPrimary = false, onClick = onHelp)
-                    MenuButton(label = stringResource(R.string.menu_exit),     icon = stringResource(R.string.menu_exit_icon), isPrimary = false, onClick = onExit)
-                }
+                MenuButtons(onStartGame, onHelp, onExit)
             }
 
             Spacer(Modifier.height(48.dp))
@@ -139,7 +135,47 @@ fun MainMenuScreen(
         }
     }
 }
+@Composable
+fun MenuTitle(glowAlpha: Float) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        HorizontalDividerWithDiamonds()
+        Spacer(Modifier.height(24.dp))
+        Text(
+            text = stringResource(R.string.menu_title_top),
+            fontSize = 48.sp,
+            fontWeight = FontWeight.Black,
+            letterSpacing = 12.sp,
+            color = TtTextPrimary,
+            style = LocalTextStyle.current.copy(
+                shadow = Shadow(color = TtBluePrimary.copy(alpha = glowAlpha), blurRadius = 24f)
+            )
+        )
+        Text(
+            text = stringResource(R.string.menu_title_bottom),
+            fontSize = 48.sp,
+            fontWeight = FontWeight.Black,
+            letterSpacing = 12.sp,
+            color = TtGoldLight,
+            style = LocalTextStyle.current.copy(
+                shadow = Shadow(color = TtGold.copy(alpha = glowAlpha), blurRadius = 28f)
+            )
+        )
+        Spacer(Modifier.height(8.dp))
+        HorizontalDividerWithDiamonds()
+    }
+}
 
+@Composable
+fun MenuButtons(onStartGame: () -> Unit, onHelp: () -> Unit, onExit: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        MenuButton(label = stringResource(R.string.menu_new_game), icon = stringResource(R.string.menu_new_game_icon), isPrimary = true,  onClick = onStartGame)
+        MenuButton(label = stringResource(R.string.menu_help),     icon = "?", isPrimary = false, onClick = onHelp)
+        MenuButton(label = stringResource(R.string.menu_exit),     icon = stringResource(R.string.menu_exit_icon), isPrimary = false, onClick = onExit)
+    }
+}
 // Botón de mení
 @Composable
 fun MenuButton(label: String, icon: String, isPrimary: Boolean, onClick: () -> Unit) {
