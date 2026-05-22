@@ -1,6 +1,7 @@
 package com.example.tripletriad.ui.screens
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -262,17 +264,88 @@ fun GameScreen(
     isTimeEnabled: Boolean,
     viewModel: GameViewModel
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(TtBgDeep)
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(Modifier.height(8.dp))
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-        // Cabecera
+    if (isLandscape) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(TtBgDeep)
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Puntuaciones derecha
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                GameHeader(playerName, isTimeEnabled, viewModel)
+                ScoreBar(viewModel)
+                Spacer(Modifier.height(16.dp))
+                HandRow(viewModel.opponentHand, TtOpponentRed) { }
+                Spacer(Modifier.height(16.dp))
+                HandRow(viewModel.playerHand, TtPlayerBlue) { card -> viewModel.selectCard(card) }
+            }
+            // Tablero izquierda
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .aspectRatio(1f)
+                    .border(1.dp, TtBorder, RoundedCornerShape(6.dp))
+                    .background(TtBgSurface, RoundedCornerShape(6.dp))
+            ) {
+                GameBoard(viewModel)
+            }
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(TtBgDeep)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.height(8.dp))
+            GameHeader(playerName, isTimeEnabled, viewModel)
+            Spacer(Modifier.height(16.dp))
+            ScoreBar(viewModel)
+            Spacer(Modifier.height(24.dp))
+            HandRow(viewModel.opponentHand, TtOpponentRed) { }
+            Spacer(Modifier.height(24.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.85f)
+                    .aspectRatio(1f)
+                    .border(1.dp, TtBorder, RoundedCornerShape(6.dp))
+                    .background(TtBgSurface, RoundedCornerShape(6.dp))
+            ) {
+                GameBoard(viewModel)
+            }
+            Spacer(Modifier.height(24.dp))
+            HandRow(viewModel.playerHand, TtPlayerBlue) { card -> viewModel.selectCard(card) }
+        }
+    }
+}
+
+@Composable
+fun GameBoard(viewModel: GameViewModel) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        modifier = Modifier.fillMaxSize().padding(4.dp)
+    ) {
+        items(9) { index ->
+            BoardCell(card = viewModel.board[index], onClick = { viewModel.playCard(index) })
+        }
+    }
+}
+
+@Composable
+fun GameHeader(playerName: String, isTimeEnabled: Boolean, viewModel: GameViewModel) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = playerName.uppercase(),
             fontSize = 13.sp,
@@ -280,8 +353,6 @@ fun GameScreen(
             fontWeight = FontWeight.SemiBold,
             color = TtTextSecondary
         )
-
-        // Temporizador
         if (isTimeEnabled) {
             Spacer(Modifier.height(4.dp))
             val timeColor = if (viewModel.timeLeft <= 10) TtOpponentRed else TtTextSecondary
@@ -289,154 +360,68 @@ fun GameScreen(
                 text = "${viewModel.timeLeft}s",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Black,
-                color = timeColor,
-                style = LocalTextStyle.current.copy(
-                    shadow = Shadow(color = timeColor.copy(alpha = 0.5f), blurRadius = 10f)
-                )
+                color = timeColor
             )
         }
+    }
+}
 
-        Spacer(Modifier.height(16.dp))
-
-        // Marcador
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(1.dp, TtBorder, RoundedCornerShape(6.dp))
-                .background(TtBgSurface, RoundedCornerShape(6.dp))
-                .padding(vertical = 12.dp, horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Jugador
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "${viewModel.playerScore}", fontSize = 28.sp, fontWeight = FontWeight.Black, color = TtPlayerBlue)
-                Text(text = "TU", fontSize = 9.sp, letterSpacing = 2.sp, color = TtTextSecondary)
-            }
-            // Turno
-            Box(
-                modifier = Modifier
-                    .border(1.dp, TtBorder, RoundedCornerShape(4.dp))
-                    .background(TtBgCard, RoundedCornerShape(4.dp))
-                    .padding(horizontal = 10.dp, vertical = 6.dp)
-            ) {
-                Text(
-                    text = if (viewModel.isPlayer1Turn)
-                        stringResource(R.string.game_turn_yours)
-                    else
-                        stringResource(R.string.game_turn_opponent),
-                    fontSize = 9.sp,
-                    letterSpacing = 1.sp,
-                    color = if (viewModel.isPlayer1Turn) TtGoldLight else TtTextDim
-                )
-            }
-            // Rival
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "${viewModel.opponentScore}", fontSize = 28.sp, fontWeight = FontWeight.Black, color = TtOpponentRed)
-                Text(text = "RIVAL", fontSize = 9.sp, letterSpacing = 2.sp, color = TtTextSecondary)
-            }
+@Composable
+fun ScoreBar(viewModel: GameViewModel) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, TtBorder, RoundedCornerShape(6.dp))
+            .background(TtBgSurface, RoundedCornerShape(6.dp))
+            .padding(vertical = 12.dp, horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("${viewModel.playerScore}", fontSize = 28.sp, fontWeight = FontWeight.Black, color = TtPlayerBlue)
+            Text("TU", fontSize = 9.sp, letterSpacing = 2.sp, color = TtTextSecondary)
         }
-
-        Spacer(Modifier.height(24.dp))
-
-        // Mano del oponente
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier.padding(bottom = 4.dp)
-        ) {
-            HorizontalDivider(modifier = Modifier.weight(1f), color = TtOpponentRed.copy(alpha = 0.4f))
-            Text(
-                text = stringResource(id = R.string.game_opponent_hand).uppercase(),
-                fontSize = 9.sp,
-                letterSpacing = 3.sp,
-                color = TtOpponentRed,
-                fontWeight = FontWeight.Bold
-            )
-            HorizontalDivider(modifier = Modifier.weight(1f), color = TtOpponentRed.copy(alpha = 0.4f))
-        }
-
-        Spacer(Modifier.height(8.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier.padding(bottom = 16.dp)
-        ) {
-            viewModel.opponentHand.forEach { card ->
-                Box(
-                    modifier = Modifier
-                        .border(1.dp, TtBorder.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
-                ) {
-                    CardView(card, color = TtOpponentRed)
-                }
-            }
-        }
-
-        Spacer(Modifier.height(24.dp))
-
-        // Tablero 3x3
         Box(
             modifier = Modifier
-                .size(300.dp)
-                .border(1.dp, TtBorder, RoundedCornerShape(6.dp))
-                .background(TtBgSurface, RoundedCornerShape(6.dp))
+                .border(1.dp, TtBorder, RoundedCornerShape(4.dp))
+                .background(TtBgCard, RoundedCornerShape(4.dp))
+                .padding(horizontal = 10.dp, vertical = 6.dp)
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
+            Text(
+                text = if (viewModel.isPlayer1Turn)
+                    stringResource(R.string.game_turn_yours)
+                else
+                    stringResource(R.string.game_turn_opponent),
+                fontSize = 9.sp,
+                letterSpacing = 1.sp,
+                color = if (viewModel.isPlayer1Turn) TtGoldLight else TtTextDim
+            )
+        }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("${viewModel.opponentScore}", fontSize = 28.sp, fontWeight = FontWeight.Black, color = TtOpponentRed)
+            Text("RIVAL", fontSize = 9.sp, letterSpacing = 2.sp, color = TtTextSecondary)
+        }
+    }
+}
+
+@Composable
+fun HandRow(hand: List<Card>, color: Color, onCardClick: (Card) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        hand.forEach { card ->
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(4.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onCardClick(card) }
+                    .border(1.dp, TtBorder.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
             ) {
-                items(9) { index ->
-                    BoardCell(card = viewModel.board[index], onClick = { viewModel.playCard(index) })
-                }
-            }
-        }
-
-        Spacer(Modifier.height(24.dp))
-
-        // Mano del jugador
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier.padding(bottom = 4.dp)
-        ) {
-            HorizontalDivider(modifier = Modifier.weight(1f), color = TtBorder)
-            Text(stringResource(R.string.game_player_hand), fontSize = 9.sp, letterSpacing = 3.sp, color = TtTextDim)
-            HorizontalDivider(modifier = Modifier.weight(1f), color = TtBorder)
-        }
-
-        Spacer(Modifier.height(8.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier.padding(bottom = 16.dp)
-        ) {
-            viewModel.playerHand.forEach { card ->
-                val isSelected = card == viewModel.selectedCard
-                Box(
-                    modifier = Modifier
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) { viewModel.selectCard(card) }
-                        .border(
-                            width = if (isSelected) 2.dp else 1.dp,
-                            color = if (isSelected) TtGoldLight else TtBorder,
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                        .background(
-                            if (isSelected) TtGold.copy(alpha = 0.1f) else Color.Transparent,
-                            RoundedCornerShape(4.dp)
-                        )
-                        .scale(if (isSelected) 1.06f else 1f)
-                ) {
-                    CardView(card, color = TtPlayerBlue)
-                }
+                CardView(card, color = color)
             }
         }
     }
 }
+
 
 // Celdas del tablero
 @Composable
