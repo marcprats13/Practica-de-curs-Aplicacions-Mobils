@@ -30,7 +30,6 @@ class ConfigurationViewModel : ViewModel() {
     fun updateReverseMode(value: Boolean)  {
         isReverseMode = value
     }
-
     fun isConfigValid(): Boolean {
         return if (alias.isBlank()) {
             isAliasError = true

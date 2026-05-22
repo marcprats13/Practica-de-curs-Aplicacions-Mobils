@@ -37,10 +37,7 @@ class ConfigurationActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = TtBgDeep
                 ) {
-                    val viewModel: ConfigurationViewModel = viewModel()
-
                     ConfiguracionScreen(
-                        viewModel = viewModel,
                         onStartGame = { alias, isTimeEnabled, isBorders, isReverse ->
                             val intent = Intent(this, GameActivity::class.java).apply {
                                 putExtra(IntentKeys.EXTRA_ALIAS,        alias)
@@ -60,8 +57,8 @@ class ConfigurationActivity : ComponentActivity() {
 
 @Composable
 fun ConfiguracionScreen(
-    viewModel: ConfigurationViewModel,
-    onStartGame: (String, Boolean, Boolean, Boolean) -> Unit) {
+    onStartGame: (String, Boolean, Boolean, Boolean) -> Unit,
+    viewModel: ConfigurationViewModel = viewModel()) {
 
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { delay(AnimationConfig.INITIAL_START_DELAY); visible = true }
