@@ -86,12 +86,15 @@ fun ConsultScreen(
                 DetailReg(seleccion)
             }
             Spacer(Modifier.height(12.dp))
-            TtButton(
-                label = stringResource(R.string.consult_return),
-                color = TtPlayerBlue,
+            Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { partidaSeleccionada = null }
-            )
+                onClick = { partidaSeleccionada = null },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = TtPlayerBlue
+                )
+            ) {
+                Text(stringResource(R.string.consult_return))
+            }
         } else {
             if (partidas.isEmpty()) {
                 Box(
@@ -118,12 +121,15 @@ fun ConsultScreen(
                 }
             }
             Spacer(Modifier.height(12.dp))
-            TtButton(
-                label = stringResource(R.string.consult_menu),
-                color = TtPlayerBlue,
+            Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = onBack
-            )
+                onClick = onBack,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = TtPlayerBlue
+                )
+            ) {
+                Text(stringResource(R.string.consult_menu))
+            }
         }
     }
 }
