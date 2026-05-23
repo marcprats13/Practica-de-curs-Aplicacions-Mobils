@@ -210,6 +210,10 @@ fun ConfiguracionScreen(
                 StartButton(
                     onClick = {
                         if (viewModel.isConfigValid()) {
+                            // PRIMER: Desem persistentment les preferències a través del ViewModel
+                            viewModel.savePreferences()
+
+                            // SEGONS: Continuem amb la lògica de començar la partida
                             onStartGame(viewModel.alias, viewModel.isTimeEnabled, viewModel.isBordersMode, viewModel.isReverseMode)
                         }
                     }
