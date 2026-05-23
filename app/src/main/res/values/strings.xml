@@ -7,7 +7,10 @@
     <!-- Main Menu -->
     <string name="menu_new_game">NUEVA PARTIDA</string>
     <string name="menu_new_game_icon">▶</string>
+    <string name="menu_consult">CONSULTAR PARTIDAS</string>
+    <string name="menu_consult_icon">▤</string>
     <string name="menu_help">AYUDA</string>
+    <string name="menu_help_icon">"?"</string>
     <string name="menu_exit">SALIR</string>
     <string name="menu_exit_icon">✕</string>
     <string name="menu_title_top">TRIPLE</string>
@@ -105,4 +108,13 @@
     <string name="splash_card_left">5</string>
     <string name="splash_card_right">8</string>
     <string name="splash_card_center">◆</string>
+
+    <!-- Consult Screen -->
+    <string name="consult_game">CONSULTAR PARTIDAS</string>
+    <string name="consult_no_game">No hay partidas registradas</string>
+    <string name="consult_menu">MENÚ PRINCIPAL</string>
+    <string name="consult_detail">DETALLE DE LA PARTIDA</string>
+    <string name="consult_return">VOLVER A LA LISTA</string>
+
+
 </resources>

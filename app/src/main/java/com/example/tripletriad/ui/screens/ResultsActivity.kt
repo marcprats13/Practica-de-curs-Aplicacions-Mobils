@@ -27,9 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tripletriad.GameApplication
 import com.example.tripletriad.utils.EmailConfig
 import com.example.tripletriad.utils.GameSettings
 import com.example.tripletriad.R
+import com.example.tripletriad.data.PartidaEntity
 import com.example.tripletriad.ui.theme.*
 import kotlinx.coroutines.delay
 import java.time.LocalDateTime
@@ -37,6 +39,8 @@ import java.time.format.DateTimeFormatter
 import com.example.tripletriad.viewmodel.ResultsViewModel
 import com.example.tripletriad.utils.IntentKeys
 import com.example.tripletriad.utils.AnimationConfig
+import com.example.tripletriad.viewmodel.PartidaViewModel
+import com.example.tripletriad.viewmodel.PartidaViewModelFactory
 
 class ResultsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,6 +58,13 @@ class ResultsActivity : ComponentActivity() {
 
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
         val now = LocalDateTime.now().format(formatter)
+
+        val resultadoTexto = when {
+            timedOut -> "Tiempo agotado"
+            p1 > opp -> "Victoria"
+            p1 < opp -> "Derrota"
+            else     -> "Empate"
+        }
 
         val logResumen = """
             RESUMEN DE LA PARTIDA
@@ -78,8 +89,31 @@ class ResultsActivity : ComponentActivity() {
 
                     val viewModel: ResultsViewModel = viewModel()
 
+                    val partidaViewModel: PartidaViewModel = viewModel(
+                        factory = PartidaViewModelFactory(
+                            (application as GameApplication).repository
+                        )
+                    )
+
+
                     LaunchedEffect(Unit) {
                         viewModel.initData(subject = now, log = logResumen)
+                    }
+
+                    LaunchedEffect(Unit) {
+                        partidaViewModel.insert(
+                            PartidaEntity(
+                                alias = alias,
+                                fechaHora = now,
+                                tamParrilla = size,
+                                modoFronteras = borders,
+                                modoInverso = reverse,
+                                tiempoEmpleado = time,
+                                puntosJugador = p1,
+                                puntosEnemigo = opp,
+                                resultado = resultadoTexto
+                            )
+                        )
                     }
 
                     ResultsScreen(

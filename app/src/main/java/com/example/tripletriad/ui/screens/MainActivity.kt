@@ -38,6 +38,7 @@ class MainActivity : ComponentActivity() {
                     MainMenuScreen(
                         onHelp      = { startActivity(Intent(this, HelpActivity::class.java)) },
                         onStartGame = { startActivity(Intent(this, ConfigurationActivity::class.java)) },
+                        onConsult   = { startActivity(Intent(this, ConsultActivity::class.java)) },
                         onExit      = { finishAffinity() }
                     )
                 }
@@ -50,6 +51,7 @@ class MainActivity : ComponentActivity() {
 fun MainMenuScreen(
     onHelp: () -> Unit,
     onStartGame: () -> Unit,
+    onConsult: () -> Unit,
     onExit: () -> Unit
 ) {
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -89,7 +91,7 @@ fun MainMenuScreen(
                     enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM)) +
                             slideInHorizontally(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM, easing = EaseOutCubic)) { 80 }
                 ) {
-                    MenuButtons(onStartGame, onHelp, onExit)
+                    MenuButtons(onStartGame, onHelp, onConsult, onExit)
                 }
             }
         }
@@ -116,7 +118,7 @@ fun MainMenuScreen(
                 enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM)) +
                         slideInVertically(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM, easing = EaseOutCubic)) { 60 }
             ) {
-                MenuButtons(onStartGame, onHelp, onExit)
+                MenuButtons(onStartGame, onHelp, onConsult, onExit)
             }
 
             Spacer(Modifier.height(48.dp))
@@ -166,13 +168,14 @@ fun MenuTitle(glowAlpha: Float) {
 }
 
 @Composable
-fun MenuButtons(onStartGame: () -> Unit, onHelp: () -> Unit, onExit: () -> Unit) {
+fun MenuButtons(onStartGame: () -> Unit, onHelp: () -> Unit, onConsult: () -> Unit, onExit: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         MenuButton(label = stringResource(R.string.menu_new_game), icon = stringResource(R.string.menu_new_game_icon), isPrimary = true,  onClick = onStartGame)
-        MenuButton(label = stringResource(R.string.menu_help),     icon = "?", isPrimary = false, onClick = onHelp)
+        MenuButton(label = stringResource(R.string.menu_consult),  icon = stringResource(R.string.menu_consult_icon), isPrimary = false, onClick = onConsult)
+        MenuButton(label = stringResource(R.string.menu_help),     icon = stringResource(R.string.menu_help_icon), isPrimary = false, onClick = onHelp)
         MenuButton(label = stringResource(R.string.menu_exit),     icon = stringResource(R.string.menu_exit_icon), isPrimary = false, onClick = onExit)
     }
 }
