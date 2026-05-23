@@ -30,37 +30,54 @@ import com.example.tripletriad.viewmodel.MainViewModel
 import androidx.compose.foundation.shape.RoundedCornerShape
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             TripleTriadTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = TtBgDeep
-                ) {
-                    val mainViewModel: MainViewModel = viewModel()
+                val mainViewModel: MainViewModel = viewModel()
 
-                    MainMenuScreen(
-                        onStartGame = {
-                            if (mainViewModel.hasPreferences()) {
-                                // Si té preferències desades, anem DIRECTAMENT al joc complint el requisit
-                                val intent = Intent(this, GameActivity::class.java).apply {
-                                    putExtra(IntentKeys.EXTRA_ALIAS,        mainViewModel.alias)
-                                    putExtra(IntentKeys.EXTRA_TIME_CONTROL, mainViewModel.isTimeEnabled)
-                                    putExtra(IntentKeys.EXTRA_BORDERS_MODE, mainViewModel.isBordersMode)
-                                    putExtra(IntentKeys.EXTRA_REVERSE_MODE, mainViewModel.isReverseMode)
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = {},
+                            actions = {
+                                IconButton(
+                                    onClick = { startActivity(Intent(this@MainActivity, ConfigurationActivity::class.java)) }
+                                ) {
+                                    Text("⚙", fontSize = 24.sp, color = TtGoldLight)
                                 }
-                                startActivity(intent)
-                            } else {
-                                // Si és la primera vegada i està buit, obligem a passar per configuració
-                                startActivity(Intent(this, ConfigurationActivity::class.java))
-                            }
-                        },
-                        onConfig = { startActivity(Intent(this, ConfigurationActivity::class.java)) },
-                        onConsult = { startActivity(Intent(this, ConsultActivity::class.java)) },
-                        onHelp    = { startActivity(Intent(this, HelpActivity::class.java)) },
-                        onExit    = { finishAffinity() }
-                    )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                        )
+                    },
+                    containerColor = TtBgDeep
+                ) { innerPadding ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        color = Color.Transparent
+                    ) {
+                        MainMenuScreen(
+                            onStartGame = {
+                                if (mainViewModel.hasPreferences()) {
+                                    val intent = Intent(this@MainActivity, GameActivity::class.java).apply {
+                                        putExtra(IntentKeys.EXTRA_ALIAS,        mainViewModel.alias)
+                                        putExtra(IntentKeys.EXTRA_TIME_CONTROL, mainViewModel.isTimeEnabled)
+                                        putExtra(IntentKeys.EXTRA_BORDERS_MODE, mainViewModel.isBordersMode)
+                                        putExtra(IntentKeys.EXTRA_REVERSE_MODE, mainViewModel.isReverseMode)
+                                    }
+                                    startActivity(intent)
+                                } else {
+                                    startActivity(Intent(this@MainActivity, ConfigurationActivity::class.java))
+                                }
+                            },
+                            onConsult = { startActivity(Intent(this@MainActivity, ConsultActivity::class.java)) },
+                            onHelp    = { startActivity(Intent(this@MainActivity, HelpActivity::class.java)) },
+                            onExit    = { finishAffinity() }
+                        )
+                    }
                 }
             }
         }
@@ -70,7 +87,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainMenuScreen(
     onStartGame: () -> Unit,
-    onConfig: () -> Unit,
     onConsult: () -> Unit,
     onHelp: () -> Unit,
     onExit: () -> Unit
@@ -104,7 +120,7 @@ fun MainMenuScreen(
                 this@Row.AnimatedVisibility(
                     visible = visible,
                     enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM)) + slideInHorizontally(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM, easing = EaseOutCubic)) { 80 }
-                ) { MenuButtons(onStartGame, onConfig, onConsult, onHelp, onExit) }
+                ) { MenuButtons(onStartGame, onConsult, onHelp, onExit) }
             }
         }
     } else {
@@ -123,7 +139,7 @@ fun MainMenuScreen(
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM)) + slideInVertically(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM, easing = EaseOutCubic)) { 60 }
-            ) { MenuButtons(onStartGame, onConfig, onConsult, onHelp, onExit) }
+            ) { MenuButtons(onStartGame, onConsult, onHelp, onExit) }
 
             Spacer(Modifier.height(32.dp))
 
@@ -155,14 +171,12 @@ fun MenuTitle(glowAlpha: Float) {
 }
 
 @Composable
-fun MenuButtons(onStartGame: () -> Unit, onConfig: () -> Unit, onConsult: () -> Unit, onHelp: () -> Unit, onExit: () -> Unit) {
+fun MenuButtons(onStartGame: () -> Unit, onConsult: () -> Unit, onHelp: () -> Unit, onExit: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         MenuButton(label = stringResource(R.string.menu_new_game), icon = stringResource(R.string.menu_new_game_icon), isPrimary = true, onClick = onStartGame)
-        // Nou botó obligatori de Configuració perquè l'usuari pugui accedir voluntàriament
-        MenuButton(label = "CONFIGURACIÓN", icon = "⚙", isPrimary = false, onClick = onConfig)
         MenuButton(label = stringResource(R.string.menu_consult), icon = stringResource(R.string.menu_consult_icon), isPrimary = false, onClick = onConsult)
         MenuButton(label = stringResource(R.string.menu_help), icon = stringResource(R.string.menu_help_icon), isPrimary = false, onClick = onHelp)
         MenuButton(label = stringResource(R.string.menu_exit), icon = stringResource(R.string.menu_exit_icon), isPrimary = false, onClick = onExit)
