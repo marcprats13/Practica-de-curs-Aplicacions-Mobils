@@ -39,6 +39,7 @@ import java.time.format.DateTimeFormatter
 import com.example.tripletriad.viewmodel.ResultsViewModel
 import com.example.tripletriad.utils.IntentKeys
 import com.example.tripletriad.utils.AnimationConfig
+import com.example.tripletriad.viewmodel.MainViewModel
 import com.example.tripletriad.viewmodel.PartidaViewModel
 import com.example.tripletriad.viewmodel.PartidaViewModelFactory
 
@@ -91,6 +92,9 @@ class ResultsActivity : ComponentActivity() {
                         (application as GameApplication).repository
                     )
                 )
+
+                // ViewModel del DataStore
+                val mainViewModel: MainViewModel = viewModel()
 
                 LaunchedEffect(Unit) {
                     viewModel.initData(subject = now, log = logResumen)
@@ -164,7 +168,18 @@ class ResultsActivity : ComponentActivity() {
                                     getString(R.string.results_chooser)))
                             },
                             onPlayAgain = {
-                                startActivity(Intent(this@ResultsActivity, ConfigurationActivity::class.java))
+                                if (mainViewModel.hasPreferences()) {
+                                    // Si hay una configuración guardada, vamos directo a la partida
+                                    val intent = Intent(this@ResultsActivity, GameActivity::class.java).apply {
+                                        putExtra(IntentKeys.EXTRA_ALIAS,        mainViewModel.alias)
+                                        putExtra(IntentKeys.EXTRA_TIME_CONTROL, mainViewModel.isTimeEnabled)
+                                        putExtra(IntentKeys.EXTRA_BORDERS_MODE, mainViewModel.isBordersMode)
+                                        putExtra(IntentKeys.EXTRA_REVERSE_MODE, mainViewModel.isReverseMode)
+                                    }
+                                    startActivity(intent)
+                                } else {
+                                    startActivity(Intent(this@ResultsActivity, ConfigurationActivity::class.java))
+                                }
                                 finish()
                             },
                             onExit = { finishAffinity() }

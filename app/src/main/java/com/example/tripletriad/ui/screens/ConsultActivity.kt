@@ -80,6 +80,13 @@ fun ConsultScreen(
     var selectedId by rememberSaveable { mutableStateOf<Int?>(null) }
     val seleccion = partidas.find { it.id == selectedId }
 
+    // Para preseleccionar la primera partida automaticamente
+    LaunchedEffect(partidas) {
+        if (selectedId == null && partidas.isNotEmpty()) {
+            selectedId = partidas.first().id
+        }
+    }
+
 
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
@@ -185,7 +192,7 @@ fun ListaPartidasPane(
     }
 }
 
-// Panel secundario: el detalle de una partida
+// Panel secundario: detalle de partida
 @Composable
 fun DetalleRegPane(
     partida: PartidaEntity,
