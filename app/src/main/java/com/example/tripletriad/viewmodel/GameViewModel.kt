@@ -55,7 +55,7 @@ class GameViewModel : ViewModel() {
 
     var selectedCard by mutableStateOf<Card?>(null)
         private set
-    var timeLeft by mutableIntStateOf(25) // Por defecto 25, pero lo cambiaremos
+    var timeLeft by mutableIntStateOf(25)
         private set
 
     var isBordersMode by mutableStateOf(false)

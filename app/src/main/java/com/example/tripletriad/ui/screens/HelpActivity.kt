@@ -1,5 +1,6 @@
 package com.example.tripletriad.ui.screens
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
@@ -57,6 +59,8 @@ fun helpSections(): List<HelpSection> = listOf(
 
 @Composable
 fun HelpScreen(onBack: () -> Unit) {
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { delay(AnimationConfig.INITIAL_START_DELAY); visible = true }
 
@@ -73,29 +77,65 @@ fun HelpScreen(onBack: () -> Unit) {
                 HelpHeader(onBack = onBack)
             }
 
-            // Contenido
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-                AnimatedVisibility(
-                    visible = visible,
-                    enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_SHORT))
-                ) { CardDemoSection() }
-
-                helpSections().forEachIndexed { index, section ->
+            if (isLandscape) {
+                // En landscape
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        AnimatedVisibility(
+                            visible = visible,
+                            enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_SHORT))
+                        ) { CardDemoSection() }
+                    }
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        helpSections().forEachIndexed { index, section ->
+                            AnimatedVisibility(
+                                visible = visible,
+                                enter = fadeIn(tween(AnimationConfig.DURATION_FAST, AnimationConfig.DELAY_SHORT + index * 100)) +
+                                        slideInHorizontally(tween(AnimationConfig.DURATION_FAST,
+                                            AnimationConfig.DELAY_SHORT + index * 100)) { 40 }
+                            ) { HelpSectionCard(section = section) }
+                        }
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
+            } else {
+                // En portrait
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
                     AnimatedVisibility(
                         visible = visible,
-                        enter = fadeIn(tween(AnimationConfig.DURATION_FAST, AnimationConfig.DELAY_SHORT + index * 100)) +
-                                slideInHorizontally(tween(AnimationConfig.DURATION_FAST,
-                                    AnimationConfig.DELAY_SHORT + index * 100)) { 40 }
-                    ) { HelpSectionCard(section = section) }
-                }
+                        enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_SHORT))
+                    ) { CardDemoSection() }
 
-                Spacer(Modifier.height(8.dp))
+                    helpSections().forEachIndexed { index, section ->
+                        AnimatedVisibility(
+                            visible = visible,
+                            enter = fadeIn(tween(AnimationConfig.DURATION_FAST, AnimationConfig.DELAY_SHORT + index * 100)) +
+                                    slideInHorizontally(tween(AnimationConfig.DURATION_FAST,
+                                        AnimationConfig.DELAY_SHORT + index * 100)) { 40 }
+                        ) { HelpSectionCard(section = section) }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
             }
         }
     }

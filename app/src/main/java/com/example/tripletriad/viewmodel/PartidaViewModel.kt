@@ -13,9 +13,16 @@ class PartidaViewModel(private val repository: PartidaRepository) : ViewModel() 
     // Flow del repositorio con todas las partidas.
     val allPartidas = repository.allPartidas
 
+    // Para indicar si la partida de x pantalla ya se ha guardado
+    private var partidaGuardada = false
+
     // Coroutine para insertar sin bloquear la interficie
-    fun insert(partida: PartidaEntity) = viewModelScope.launch {
-        repository.insert(partida)
+    fun insert(partida: PartidaEntity) {
+        if (partidaGuardada) return
+        partidaGuardada = true
+        viewModelScope.launch {
+            repository.insert(partida)
+        }
     }
 }
 

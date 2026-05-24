@@ -61,8 +61,7 @@ class ResultsActivity : ComponentActivity() {
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
         val now = LocalDateTime.now().format(formatter)
 
-        // Resultado de la partida como texto. Se calcula UNA vez aquí
-        // y se reutiliza tanto para el log como para guardar en la BBDD.
+        // Resultado de la partida
         val resultadoTexto = when {
             timedOut -> "Derrota (tiempo agotado)"
             p1 > opp -> "Victoria"
@@ -83,10 +82,10 @@ class ResultsActivity : ComponentActivity() {
 
         setContent {
             TripleTriadTheme {
-                // ViewModel del resumen/email (diseño original)
+                // ViewModel del resumen/email
                 val viewModel: ResultsViewModel = viewModel()
 
-                // ViewModel de persistencia: usa el repository de la GameApplication
+                // ViewModel de persistencia que usa el repository de la GameApplication
                 val partidaViewModel: PartidaViewModel = viewModel(
                     factory = PartidaViewModelFactory(
                         (application as GameApplication).repository
@@ -100,8 +99,7 @@ class ResultsActivity : ComponentActivity() {
                     viewModel.initData(subject = now, log = logResumen)
                 }
 
-                // Inserta la partida en la BBDD UNA sola vez (al entrar en Resultados).
-                // LaunchedEffect(Unit) garantiza que no se repita aunque se gire la pantalla.
+                // Inserta la partida en la BBDD
                 LaunchedEffect(Unit) {
                     partidaViewModel.insert(
                         PartidaEntity(
