@@ -24,7 +24,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch { dataStoreManager.reverseModeFlow.collect { isReverseMode = it } }
     }
 
-    // Si l'àlies està buit, vol dir que l'usuari mai s'ha configurat la app
+    // Si los alias estan vacios
     fun hasPreferences(): Boolean {
         return alias.isNotBlank()
     }

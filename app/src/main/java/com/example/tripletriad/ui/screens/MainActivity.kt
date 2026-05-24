@@ -215,8 +215,19 @@ fun MenuButton(label: String, icon: String, isPrimary: Boolean, onClick: () -> U
 @Composable
 fun MiniCardDecoration(delay: Int = 0) {
     val infiniteTransition = rememberInfiniteTransition(label = "card_float")
-    val offsetY by infiniteTransition.animateFloat(initialValue = 0f, targetValue = -6f, animationSpec = infiniteRepeatable(animation = tween(AnimationConfig.DURATION_LONG + delay, easing = EaseInOutSine), repeatMode = RepeatMode.Reverse), label = "float")
-    Box(modifier = Modifier.size(width = 44.dp, height = 56.dp).offset(y = offsetY.dp).border(1.dp, TtBluePrimary.copy(alpha = 0.5f), RoundedCornerShape(4.dp)).background(Brush.verticalGradient(listOf(TtBgCard, TtBgDeep)), RoundedCornerShape(4.dp)), contentAlignment = Alignment.Center) {
+    val offsetY by infiniteTransition.animateFloat(
+        initialValue = 0f, targetValue = -6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(AnimationConfig.DURATION_LONG + delay, easing = EaseInOutSine),
+            repeatMode = RepeatMode.Reverse
+        ), label = "float")
+    Box(
+        modifier = Modifier
+            .size(width = 44.dp, height = 56.dp)
+            .offset(y = offsetY.dp)
+            .border(1.dp, TtBluePrimary.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
+            .background(Brush.verticalGradient(listOf(TtBgCard, TtBgDeep)), RoundedCornerShape(4.dp)),
+        contentAlignment = Alignment.Center) {
         Text("?", color = TtBlueLight.copy(alpha = 0.4f), fontSize = 18.sp, fontWeight = FontWeight.Black)
     }
 }

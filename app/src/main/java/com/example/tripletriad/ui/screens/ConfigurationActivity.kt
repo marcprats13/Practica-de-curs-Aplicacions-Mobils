@@ -202,7 +202,7 @@ fun ConfiguracionScreen(
 
             Spacer(Modifier.height(32.dp))
 
-            // Botón de comenzar partida
+            // Botón para empezar partida
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_LONG)) + slideInVertically(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_LONG)) { 60 }
@@ -210,10 +210,8 @@ fun ConfiguracionScreen(
                 StartButton(
                     onClick = {
                         if (viewModel.isConfigValid()) {
-                            // PRIMER: Desem persistentment les preferències a través del ViewModel
                             viewModel.savePreferences()
 
-                            // SEGONS: Continuem amb la lògica de començar la partida
                             onStartGame(viewModel.alias, viewModel.isTimeEnabled, viewModel.isBordersMode, viewModel.isReverseMode)
                         }
                     }

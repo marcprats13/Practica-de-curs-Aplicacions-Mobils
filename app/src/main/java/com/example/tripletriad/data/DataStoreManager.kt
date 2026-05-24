@@ -10,20 +10,20 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-// Extensió per instanciar el DataStore de manera única com a Singleton en el Context de l'App
+// Extensión para instanciar el DataStore de forma única como Singleton en el Contexto de la App
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
 class DataStoreManager(private val context: Context) {
 
     companion object {
-        // Definim les claus per a cada propietat que volem desar
+        // Definimos las claves para cada propiedad que queremos guardar
         val ALIAS_KEY = stringPreferencesKey("user_alias")
         val TIME_ENABLED_KEY = booleanPreferencesKey("time_enabled")
         val BORDERS_MODE_KEY = booleanPreferencesKey("borders_mode")
         val REVERSE_MODE_KEY = booleanPreferencesKey("reverse_mode")
     }
 
-    // Fluxos (Flows) per llegir els valors. Si no existeixen, retornem valors per defecte.
+    // Flows para leer los valores. Si no existen, devolvemos valores por defecto.
     val aliasFlow: Flow<String> = context.dataStore.data.map { prefs ->
         prefs[ALIAS_KEY] ?: ""
     }
@@ -40,7 +40,7 @@ class DataStoreManager(private val context: Context) {
         prefs[REVERSE_MODE_KEY] ?: false
     }
 
-    // Funcions suspeses per desar les preferències
+    // Funciones suspendidas para guardar las preferencias
     suspend fun savePreferences(alias: String, isTimeEnabled: Boolean, isBorders: Boolean, isReverse: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[ALIAS_KEY] = alias

@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class ConfigurationViewModel(application: Application) : AndroidViewModel(application) {
 
-    // Inicialitzem el gestor de persistència passant el context de l'aplicació
+    // Inicializamos el gestor
     private val dataStoreManager = DataStoreManager(application)
 
     var alias by mutableStateOf("")
@@ -26,18 +26,22 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
         private set
 
     init {
-        // Carreguem de manera asíncrona les preferències desades en obrir la pantalla
+        // Cargamos las preferencias guardadas al abrir la pantalla
         viewModelScope.launch {
-            dataStoreManager.aliasFlow.collect { alias = it }
+            dataStoreManager.aliasFlow.collect {
+                alias = it }
         }
         viewModelScope.launch {
-            dataStoreManager.timeEnabledFlow.collect { isTimeEnabled = it }
+            dataStoreManager.timeEnabledFlow.collect {
+                isTimeEnabled = it }
         }
         viewModelScope.launch {
-            dataStoreManager.bordersModeFlow.collect { isBordersMode = it }
+            dataStoreManager.bordersModeFlow.collect {
+                isBordersMode = it }
         }
         viewModelScope.launch {
-            dataStoreManager.reverseModeFlow.collect { isReverseMode = it }
+            dataStoreManager.reverseModeFlow.collect {
+                isReverseMode = it }
         }
     }
 
@@ -64,7 +68,7 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
-    // Desa l'estat actual al DataStore de forma persistent
+    // Guardamos el estado al DataStore
     fun savePreferences() {
         viewModelScope.launch {
             dataStoreManager.savePreferences(
