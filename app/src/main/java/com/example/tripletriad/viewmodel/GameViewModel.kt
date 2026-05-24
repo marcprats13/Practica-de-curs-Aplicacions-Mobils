@@ -23,6 +23,9 @@ class GameViewModel : ViewModel() {
         repeat(9) { add(null) }
     }
 
+    // Log de jugadas
+    val gameLog = mutableStateListOf<String>()
+
     val gameStartTime = System.currentTimeMillis()
 
     // Game State
@@ -102,12 +105,24 @@ class GameViewModel : ViewModel() {
         isReverseMode = reverse
     }
 
+    // Registra una jugada en el log
+    private fun logMove(player: Player, boardIndex: Int) {
+        val quien = if (player == Player.PLAYER_1) "Tú" else "Rival"
+        // Casilla 3x3
+        val fila = boardIndex / 3
+        val col = boardIndex % 3
+        // Si hay control de tiempo
+        val tiempo = if (timerJob != null) " — quedan ${timeLeft}s" else ""
+        gameLog.add("$quien → casilla ($fila,$col)$tiempo")
+    }
+
     // Método para jugar una carta en el tablero
     fun playCard(boardIndex: Int) {
         val cardToPlay = selectedCard
 
         if (timeLeft > 0 && cardToPlay != null && board[boardIndex] == null && isPlayer1Turn && !isGameOver) {
             board[boardIndex] = cardToPlay.copy()
+            logMove(Player.PLAYER_1, boardIndex)
             playerHand.remove(cardToPlay)
             selectedCard = null
 
@@ -162,6 +177,7 @@ class GameViewModel : ViewModel() {
             val finalCard = bestCard ?: opponentHand.random()
 
             board[finalIndex] = finalCard.copy()
+            logMove(Player.OPPONENT, finalIndex)
             opponentHand.remove(finalCard)
 
             checkCaptures(finalIndex)

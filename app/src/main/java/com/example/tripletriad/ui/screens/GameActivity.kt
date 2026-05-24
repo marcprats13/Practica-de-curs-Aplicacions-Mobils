@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.example.tripletriad.model.Card
 import com.example.tripletriad.utils.GameSettings
 import com.example.tripletriad.viewmodel.GameViewModel
@@ -257,9 +259,47 @@ fun ScoreChip(label: String, score: Int, color: Color) {
     }
 }
 
-// Game Screen
+// Game Screen: decide entre mono-panel (móvil) y bi-panel (tablet)
 @Composable
 fun GameScreen(
+    playerName: String,
+    isTimeEnabled: Boolean,
+    viewModel: GameViewModel
+) {
+    // Miramos si Window Size Class: expanded para tablet
+    val widthSizeClass = currentWindowAdaptiveInfo()
+        .windowSizeClass.windowWidthSizeClass
+    val isTablet = widthSizeClass == WindowWidthSizeClass.EXPANDED
+
+    if (isTablet) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(TtBgDeep)
+        ) {
+            // Panel principal: el juego
+            Box(modifier = Modifier.weight(2.5f).fillMaxHeight()) {
+                GameScreenMono(playerName, isTimeEnabled, viewModel)
+            }
+            // Panel secundario: el log de jugadas
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .padding(8.dp)
+            ) {
+                GameLogPane(viewModel)
+            }
+        }
+    } else {
+        // MÓVIL -> mono-panel: solo el juego, como hasta ahora
+        GameScreenMono(playerName, isTimeEnabled, viewModel)
+    }
+}
+
+// Game Screen (Monopanel)
+@Composable
+fun GameScreenMono(
     playerName: String,
     isTimeEnabled: Boolean,
     viewModel: GameViewModel
@@ -272,7 +312,8 @@ fun GameScreen(
                 .fillMaxSize()
                 .background(TtBgDeep)
                 .padding(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             // Puntuaciones derecha
             Column(
@@ -292,7 +333,7 @@ fun GameScreen(
             // Tablero izquierda
             Box(
                 modifier = Modifier
-                    .fillMaxHeight()
+                    .fillMaxHeight(0.85f)
                     .aspectRatio(1f)
                     .border(1.dp, TtBorder, RoundedCornerShape(6.dp))
                     .background(TtBgSurface, RoundedCornerShape(6.dp))
@@ -331,6 +372,50 @@ fun GameScreen(
     }
 }
 
+// Panel del log de jugadas
+@Composable
+fun GameLogPane(viewModel: GameViewModel) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .border(1.dp, TtBorder, RoundedCornerShape(6.dp))
+            .background(TtBgSurface, RoundedCornerShape(6.dp))
+            .padding(12.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.game_log),
+            fontSize = 11.sp,
+            letterSpacing = 3.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = TtGold
+        )
+        Spacer(Modifier.height(8.dp))
+        HorizontalDivider(color = TtBorder)
+        Spacer(Modifier.height(8.dp))
+
+        if (viewModel.gameLog.isEmpty()) {
+            Text(
+                text = stringResource(R.string.game_no_play),
+                fontSize = 12.sp,
+                color = TtTextSecondary
+            )
+        } else {
+            // Lista de jugadas, lo hacemos scrolleable si se pasa de mas
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                viewModel.gameLog.forEachIndexed { index, entrada ->
+                    Text(
+                        text = "${index + 1}. $entrada",
+                        fontSize = 12.sp,
+                        color = TtTextPrimary
+                    )
+                }
+            }
+        }
+    }
+}
 @Composable
 fun GameBoard(viewModel: GameViewModel) {
     LazyVerticalGrid(
@@ -406,7 +491,7 @@ fun ScoreBar(viewModel: GameViewModel) {
 
 @Composable
 fun HandRow(hand: List<Card>, color: Color, onCardClick: (Card) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         hand.forEach { card ->
             Box(
                 modifier = Modifier
@@ -461,7 +546,7 @@ fun CardView(card: Card, color: Color = TtPlayerBlue) {
     Box(
         modifier = Modifier
             .padding(2.dp)
-            .size(56.dp, 72.dp)
+            .size(50.dp, 64.dp)
             .border(1.dp, color.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
             .background(
                 Brush.verticalGradient(listOf(color.copy(alpha = 0.2f), TtBgDeep)),
