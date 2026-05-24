@@ -48,7 +48,7 @@ class ResultsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val alias = intent.getStringExtra(IntentKeys.EXTRA_ALIAS) ?: "Invitat"
+        val alias = intent.getStringExtra(IntentKeys.EXTRA_ALIAS) ?: getString(R.string.default_alias)
         val time  = intent.getIntExtra(IntentKeys.EXTRA_TIME_SPENT, 0)
         val p1    = intent.getIntExtra(IntentKeys.EXTRA_P1_SCORE, 0)
         val opp   = intent.getIntExtra(IntentKeys.EXTRA_OPP_SCORE, 0)
@@ -63,10 +63,10 @@ class ResultsActivity : ComponentActivity() {
 
         // Resultado de la partida
         val resultadoTexto = when {
-            timedOut -> "Derrota (tiempo agotado)"
-            p1 > opp -> "Victoria"
-            p1 < opp -> "Derrota"
-            else     -> "Empate"
+            timedOut -> getString(R.string.result_timeout)
+            p1 > opp -> getString(R.string.result_win)
+            p1 < opp -> getString(R.string.result_lose)
+            else     -> getString(R.string.result_draw)
         }
 
         val logResumen = """
@@ -85,7 +85,7 @@ class ResultsActivity : ComponentActivity() {
                 // ViewModel del resumen/email
                 val viewModel: ResultsViewModel = viewModel()
 
-                // ViewModel de persistencia que usa el repository de la GameApplication
+                // ViewModel que usa el repositorio de GameApplication
                 val partidaViewModel: PartidaViewModel = viewModel(
                     factory = PartidaViewModelFactory(
                         (application as GameApplication).repository

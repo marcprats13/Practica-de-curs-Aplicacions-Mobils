@@ -87,6 +87,13 @@
     <string name="results_btn_play_again">NUEVA PARTIDA</string>
     <string name="results_btn_exit">SALIR</string>
     <string name="results_chooser">Enviar Log…</string>
+    <string name="default_alias">Player</string>
+
+    <!-- Resultados de partida (ResultsActivity) -->
+    <string name="result_timeout">Derrota (tiempo agotado)</string>
+    <string name="result_win">Victoria</string>
+    <string name="result_lose">Derrota</string>
+    <string name="result_draw">Empate</string>
 
     <!-- Configuration Screen -->
     <string name="config_title">CONFIGURACIÓN</string>
