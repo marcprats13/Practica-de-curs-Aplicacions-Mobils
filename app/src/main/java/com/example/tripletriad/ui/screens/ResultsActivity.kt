@@ -61,6 +61,8 @@ class ResultsActivity : ComponentActivity() {
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
         val now = LocalDateTime.now().format(formatter)
 
+        // Resultado de la partida como texto. Se calcula UNA vez aquí
+        // y se reutiliza tanto para el log como para guardar en la BBDD.
         val resultadoTexto = when {
             timedOut -> "Derrota (tiempo agotado)"
             p1 > opp -> "Victoria"
@@ -81,18 +83,25 @@ class ResultsActivity : ComponentActivity() {
 
         setContent {
             TripleTriadTheme {
+                // ViewModel del resumen/email (diseño original)
                 val viewModel: ResultsViewModel = viewModel()
+
+                // ViewModel de persistencia: usa el repository de la GameApplication
                 val partidaViewModel: PartidaViewModel = viewModel(
                     factory = PartidaViewModelFactory(
                         (application as GameApplication).repository
                     )
                 )
+
+                // ViewModel del DataStore
                 val mainViewModel: MainViewModel = viewModel()
 
                 LaunchedEffect(Unit) {
                     viewModel.initData(subject = now, log = logResumen)
                 }
 
+                // Inserta la partida en la BBDD UNA sola vez (al entrar en Resultados).
+                // LaunchedEffect(Unit) garantiza que no se repita aunque se gire la pantalla.
                 LaunchedEffect(Unit) {
                     partidaViewModel.insert(
                         PartidaEntity(
@@ -118,6 +127,7 @@ class ResultsActivity : ComponentActivity() {
                             horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            // Acceso a las preferencias de usuario
                             IconButton(
                                 onClick = {
                                     startActivity(
@@ -159,6 +169,7 @@ class ResultsActivity : ComponentActivity() {
                             },
                             onPlayAgain = {
                                 if (mainViewModel.hasPreferences()) {
+                                    // Si hay una configuración guardada, vamos directo a la partida
                                     val intent = Intent(this@ResultsActivity, GameActivity::class.java).apply {
                                         putExtra(IntentKeys.EXTRA_ALIAS,        mainViewModel.alias)
                                         putExtra(IntentKeys.EXTRA_TIME_CONTROL, mainViewModel.isTimeEnabled)
@@ -180,6 +191,7 @@ class ResultsActivity : ComponentActivity() {
     }
 }
 
+// Results Screen
 @Composable
 fun ResultsScreen(
     playerName: String,
@@ -195,6 +207,7 @@ fun ResultsScreen(
     onExit: () -> Unit
 ) {
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 
@@ -215,6 +228,7 @@ fun ResultsScreen(
         GameOutcome.DRAW -> "◆"
     }
 
+    // Glow animado
     val infiniteTransition = rememberInfiniteTransition(label = "res_glow")
     val glowAlpha by infiniteTransition.animateFloat(
         initialValue = 0.3f, targetValue = 0.8f,
@@ -223,100 +237,68 @@ fun ResultsScreen(
         ), label = "glow"
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(TtBgDeep),
-        contentAlignment = Alignment.Center
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        MenuBackground()
+
         if (isLandscape) {
-            // Landscape: centrado horizontal y verticalmente
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .fillMaxHeight(0.85f)
-                    .background(TtBgSurface.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Columna izquierda - Resultado y Estadísticas
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight()
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     ResultBlock(outcome, outcomeIcon, accentColor, glowAlpha, playerName, p1Score, oppScore)
-                    Spacer(Modifier.height(16.dp))
                     StatsBlock(gridSize, timeSpent, dateTime)
                 }
-
-                // Columna derecha - Log y Botones
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     LogBlock(viewModel, focusRequester, onSend)
-                    Spacer(Modifier.height(16.dp))
                     FinalButtons(onPlayAgain, onExit)
                 }
             }
         } else {
-            // Portrait: centrado verticalmente con scroll
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .fillMaxHeight()
+                    .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .background(TtBgSurface.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                    .padding(20.dp),
+                    .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Cabecera decorativa
-                HorizontalDividerWithDiamonds()
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.results_title),
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Black,
-                    letterSpacing = 6.sp,
-                    color = TtTextPrimary,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = stringResource(R.string.results_subtitle),
-                    fontSize = 10.sp,
-                    letterSpacing = 3.sp,
-                    color = TtTextSecondary,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(Modifier.height(8.dp))
-                HorizontalDividerWithDiamonds()
-
-                Spacer(Modifier.height(20.dp))
-
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    HorizontalDividerWithDiamonds()
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.results_title),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 6.sp,
+                        color = TtTextPrimary
+                    )
+                    Text(
+                        text = stringResource(R.string.results_subtitle),
+                        fontSize = 9.sp,
+                        letterSpacing = 3.sp,
+                        color = TtTextSecondary
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    HorizontalDividerWithDiamonds()
+                }
                 ResultBlock(outcome, outcomeIcon, accentColor, glowAlpha, playerName, p1Score, oppScore)
-
-                Spacer(Modifier.height(16.dp))
-
                 StatsBlock(gridSize, timeSpent, dateTime)
-
-                Spacer(Modifier.height(16.dp))
-
                 LogBlock(viewModel, focusRequester, onSend)
-
-                Spacer(Modifier.height(16.dp))
-
                 FinalButtons(onPlayAgain, onExit)
-
-                Spacer(Modifier.height(16.dp))
             }
         }
     }
@@ -337,16 +319,16 @@ fun ResultBlock(
             .fillMaxWidth()
             .border(1.5.dp, accentColor.copy(alpha = glowAlpha), RoundedCornerShape(8.dp))
             .background(Brush.verticalGradient(listOf(TtBgSurface, TtBgDeep)), RoundedCornerShape(8.dp))
-            .padding(16.dp)
+            .padding(12.dp)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = outcomeIcon,
-                fontSize = 28.sp,
+                fontSize = 22.sp,
                 color = accentColor,
                 style = LocalTextStyle.current.copy(
                     shadow = Shadow(color = accentColor.copy(alpha = glowAlpha), blurRadius = 20f)
@@ -360,7 +342,7 @@ fun ResultBlock(
                         else                        -> R.string.results_draw
                     }
                 ),
-                fontSize = 18.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 4.sp,
                 color = accentColor,
@@ -375,7 +357,7 @@ fun ResultBlock(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ScoreChip(label = playerName.uppercase(), score = p1Score, color = TtPlayerBlue)
-                Text("—", color = TtTextDim, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                Text("—", color = TtTextDim, fontSize = 20.sp, fontWeight = FontWeight.Black)
                 ScoreChip(label = stringResource(R.string.results_machine_label), score = oppScore, color = TtOpponentRed)
             }
         }
@@ -390,13 +372,12 @@ fun StatsBlock(gridSize: Int, timeSpent: Int, dateTime: String) {
             .border(1.dp, TtBorder, RoundedCornerShape(8.dp))
             .background(TtBgSurface.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text(
             stringResource(R.string.results_stats_title),
-            fontSize = 11.sp, letterSpacing = 3.sp,
-            color = TtGold, fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center
+            fontSize = 10.sp, letterSpacing = 3.sp,
+            color = TtGold, fontWeight = FontWeight.SemiBold
         )
         StatRow(label = stringResource(R.string.results_stat_size),
             value = stringResource(R.string.results_stat_grid, gridSize))
@@ -420,14 +401,6 @@ fun LogBlock(
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            text = "ENVIAR POR CORREO",
-            fontSize = 10.sp,
-            letterSpacing = 2.sp,
-            color = TtGold,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center
-        )
         TtOutlinedField(
             value = viewModel.emailRecipient,
             onValueChange = { viewModel.updateRecipient(it) },
@@ -443,7 +416,7 @@ fun LogBlock(
             value = viewModel.logBody,
             onValueChange = { viewModel.updateLogBody(it) },
             label = "Log",
-            modifier = Modifier.height(80.dp),
+            modifier = Modifier.height(60.dp),
             singleLine = false
         )
         TtButton(
@@ -475,6 +448,8 @@ fun FinalButtons(onPlayAgain: () -> Unit, onExit: () -> Unit) {
     }
 }
 
+
+// Components reutilitzables
 @Composable
 fun StatRow(label: String, value: String) {
     Row(
@@ -499,7 +474,8 @@ fun TtButton(
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         label = "btn_scale"
     )
-    LaunchedEffect(pressed) { if (pressed) { delay(150); pressed = false } }
+    LaunchedEffect(pressed) { if (pressed) {
+        delay(150); pressed = false } }
 
     Box(
         modifier = modifier
@@ -514,7 +490,7 @@ fun TtButton(
         Text(
             text = label,
             modifier = Modifier.padding(vertical = 10.dp, horizontal = 8.dp),
-            fontSize = 11.sp,
+            fontSize = 10.sp,
             letterSpacing = 2.sp,
             fontWeight = FontWeight.Bold,
             color = color,
