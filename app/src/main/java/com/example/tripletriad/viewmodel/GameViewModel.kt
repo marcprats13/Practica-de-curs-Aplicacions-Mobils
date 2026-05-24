@@ -304,10 +304,10 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun stopTimer() {
+    private fun stopTimer() {
         timerJob?.cancel()
     }
-    fun checkGameOver() {
+    private fun checkGameOver() {
         // El juego termina si no quedan huecos en el tablero
         if (board.all { it != null }) {
             endReason = GameEndReason.BOARD_FULL

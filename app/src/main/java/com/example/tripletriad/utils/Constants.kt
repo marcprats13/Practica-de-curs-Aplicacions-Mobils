@@ -30,6 +30,5 @@ object AnimationConfig {
     const val DELAY_SHORT = 150
     const val DELAY_MEDIUM = 300
     const val DELAY_LONG = 500
-    const val DELAY_LONG_2 = 650
     const val INITIAL_START_DELAY = 80L
 }
