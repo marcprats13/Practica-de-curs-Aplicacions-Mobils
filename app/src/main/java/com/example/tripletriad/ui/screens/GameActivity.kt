@@ -501,22 +501,42 @@ fun ScoreBar(viewModel: GameViewModel) {
 
 @Composable
 fun HandRow(hand: List<Card>, color: Color, onCardClick: (Card) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    val viewModel: com.example.tripletriad.viewmodel.GameViewModel = viewModel()
+    val selectedCard = viewModel.selectedCard
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp),
+
+        horizontalArrangement = Arrangement.spacedBy((-2).dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         hand.forEach { card ->
+
+            val isSelected = card == selectedCard
+
             Box(
                 modifier = Modifier
+
+                    .offset(y = if (isSelected) (-12).dp else 0.dp)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
                     ) { onCardClick(card) }
-                    .border(1.dp, TtBorder.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
+
+                    .border(
+                        width = if (isSelected) 2.dp else 1.dp,
+                        color = if (isSelected) TtGold else TtBorder.copy(alpha = 0.4f),
+                        shape = RoundedCornerShape(4.dp)
+                    )
+                    .requiredWidth(46.dp)
             ) {
                 CardView(card, color = color)
             }
         }
     }
 }
-
 
 // Celdas del tablero
 @Composable
