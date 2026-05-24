@@ -114,7 +114,21 @@
     <string name="consult_no_game">No hay partidas registradas</string>
     <string name="consult_menu">MENÚ PRINCIPAL</string>
     <string name="consult_detail">DETALLE DE LA PARTIDA</string>
-    <string name="consult_return">VOLVER A LA LISTA</string>
+    <string name="consult_return">VISUALIZAR LISTA</string>
+    <string name="consult_select">Selecciona una partida</string>
+    <!-- Los detalles del consultscreen -->
+    <string name="detail_alias">Alias</string>
+    <string name="detail_datetime">Fecha y hora</string>
+    <string name="detail_grid">Tamaño parrilla</string>
+    <string name="detail_borders">Modo fronteras</string>
+    <string name="detail_reverse">Modo inverso</string>
+    <string name="detail_time">Tiempo empleado</string>
+    <string name="detail_player_points">Puntos jugador</string>
+    <string name="detail_enemy_points">Puntos enemigo</string>
+    <string name="detail_result">Resultado</string>
+    <string name="detail_on">Activado</string>
+    <string name="detail_off">Desactivado</string>
+    <string name="detail_seconds">%1$d segundos</string>
 
 
 </resources>

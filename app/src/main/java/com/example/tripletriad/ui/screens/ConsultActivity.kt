@@ -1,8 +1,8 @@
 package com.example.tripletriad.ui.screens
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,7 +12,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.AnimatedPane
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -27,6 +33,7 @@ import com.example.tripletriad.data.PartidaEntity
 import com.example.tripletriad.ui.theme.*
 import com.example.tripletriad.viewmodel.PartidaViewModel
 import com.example.tripletriad.viewmodel.PartidaViewModelFactory
+import kotlinx.coroutines.launch
 
 class ConsultActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,19 +57,82 @@ class ConsultActivity : ComponentActivity() {
         }
     }
 }
-
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun ConsultScreen(
     viewModel: PartidaViewModel,
     onBack: () -> Unit
 ) {
-    // Recoge el Flow de partidas de forma consciente del ciclo de vida.
+    // Recoge el Flow de partidas.
     val partidas by viewModel.allPartidas.collectAsStateWithLifecycle(
         initialValue = emptyList()
     )
 
-    var partidaSeleccionada by remember { mutableStateOf<PartidaEntity?>(null) }
+    // Navigator del scaffold.
+    val navigator = rememberListDetailPaneScaffoldNavigator<Int>()
+    val scope = rememberCoroutineScope()
 
+    BackHandler(enabled = navigator.canNavigateBack()) {
+        scope.launch { navigator.navigateBack() }
+    }
+
+    // Id de la partida seleccionada.
+    var selectedId by rememberSaveable { mutableStateOf<Int?>(null) }
+    val seleccion = partidas.find { it.id == selectedId }
+
+
+    ListDetailPaneScaffold(
+        directive = navigator.scaffoldDirective,
+        value = navigator.scaffoldValue,
+        // Panel principal (listPane): la lista de partidas
+        listPane = {
+            AnimatedPane {
+                ListaPartidasPane(
+                    partidas = partidas,
+                    onPartidaClick = { partida ->
+                        selectedId = partida.id
+                        // En móvil, navega al panel de detalle.
+                        // En tablet, el panel de detalle ya es visible y solo se actualiza.
+                        scope.launch {
+                            navigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
+                        }
+                    },
+                    onBack = onBack
+                )
+            }
+        },
+        // Panel secundario
+        detailPane = {
+            AnimatedPane {
+                if (seleccion != null) {
+                    DetalleRegPane(seleccion,
+                    mostrarVolver = navigator.canNavigateBack(),
+                    onVolver = { scope.launch { navigator.navigateBack() } }
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.consult_select),
+                            color = TtTextSecondary,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+            }
+        }
+    )
+}
+
+// Panel principal: título + lista de partidas + botón menú
+@Composable
+fun ListaPartidasPane(
+    partidas: List<PartidaEntity>,
+    onPartidaClick: (PartidaEntity) -> Unit,
+    onBack: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,61 +149,67 @@ fun ConsultScreen(
         HorizontalDivider(color = TtBorder)
         Spacer(Modifier.height(12.dp))
 
-        val seleccion = partidaSeleccionada
-
-        if (seleccion != null) {
-            Box(modifier = Modifier.weight(1f)) {
-                DetailReg(seleccion)
-            }
-            Spacer(Modifier.height(12.dp))
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { partidaSeleccionada = null },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = TtPlayerBlue
-                )
+        if (partidas.isEmpty()) {
+            Box(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                Text(stringResource(R.string.consult_return))
+                Text(
+                    text = stringResource(R.string.consult_no_game),
+                    color = TtTextSecondary,
+                    fontSize = 14.sp
+                )
             }
         } else {
-            if (partidas.isEmpty()) {
-                Box(
-                    modifier = Modifier.weight(1f).fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.consult_no_game),
-                        color = TtTextSecondary,
-                        fontSize = 14.sp
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(partidas) { partida ->
+                    PartidaItem(
+                        partida = partida,
+                        onClick = { onPartidaClick(partida) }
                     )
                 }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(partidas) { partida ->
-                        PartidaItem(
-                            partida = partida,
-                            onClick = { partidaSeleccionada = partida }
-                        )
-                    }
-                }
             }
-            Spacer(Modifier.height(12.dp))
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onBack,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = TtPlayerBlue
-                )
-            ) {
-                Text(stringResource(R.string.consult_menu))
-            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onBack,
+            colors = ButtonDefaults.buttonColors(containerColor = TtPlayerBlue)
+        ) {
+            Text(stringResource(R.string.consult_menu))
         }
     }
 }
 
+// Panel secundario: el detalle de una partida
+@Composable
+fun DetalleRegPane(
+    partida: PartidaEntity,
+    mostrarVolver: Boolean,
+    onVolver: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        DetailReg(partida)
+        if (mostrarVolver) {
+            Spacer(Modifier.weight(1f))
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onVolver,
+                colors = ButtonDefaults.buttonColors(containerColor = TtPlayerBlue)
+            ) {
+                Text(stringResource(R.string.consult_return))
+            }
+        }
+    }
+}
 // Una fila de la lista
 @Composable
 fun PartidaItem(partida: PartidaEntity, onClick: () -> Unit) {
@@ -185,15 +261,27 @@ fun DetailReg(partida: PartidaEntity) {
         )
         HorizontalDivider(color = TtBorder)
 
-        DetailRow("Alias", partida.alias)
-        DetailRow("Fecha y hora", partida.fechaHora)
-        DetailRow("Tamaño parrilla", "${partida.tamParrilla}x${partida.tamParrilla}")
-        DetailRow("Modo fronteras", if (partida.modoFronteras) "Activado" else "Desactivado")
-        DetailRow("Modo inverso", if (partida.modoInverso) "Activado" else "Desactivado")
-        DetailRow("Tiempo empleado", "${partida.tiempoEmpleado} segundos")
-        DetailRow("Puntos jugador", partida.puntosJugador.toString())
-        DetailRow("Puntos enemigo", partida.puntosEnemigo.toString())
-        DetailRow("Resultado", partida.resultado)
+        DetailRow(stringResource(R.string.detail_alias), partida.alias)
+        DetailRow(stringResource(R.string.detail_datetime), partida.fechaHora)
+        DetailRow(
+            stringResource(R.string.detail_grid),
+            "${partida.tamParrilla}x${partida.tamParrilla}"
+        )
+        DetailRow(
+            stringResource(R.string.detail_borders),
+            stringResource(if (partida.modoFronteras) R.string.detail_on else R.string.detail_off)
+        )
+        DetailRow(
+            stringResource(R.string.detail_reverse),
+            stringResource(if (partida.modoInverso) R.string.detail_on else R.string.detail_off)
+        )
+        DetailRow(
+            stringResource(R.string.detail_time),
+            stringResource(R.string.detail_seconds, partida.tiempoEmpleado)
+        )
+        DetailRow(stringResource(R.string.detail_player_points), partida.puntosJugador.toString())
+        DetailRow(stringResource(R.string.detail_enemy_points), partida.puntosEnemigo.toString())
+        DetailRow(stringResource(R.string.detail_result), partida.resultado)
     }
 }
 
