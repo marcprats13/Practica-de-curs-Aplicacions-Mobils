@@ -22,7 +22,8 @@ class GameViewModel : ViewModel() {
     val board = mutableStateListOf<Card?>().apply {
         repeat(9) { add(null) }
     }
-
+    // El header de las jugadas del log
+    val logHeader = mutableStateListOf<String>()
     // Log de jugadas
     val gameLog = mutableStateListOf<String>()
 
@@ -103,6 +104,15 @@ class GameViewModel : ViewModel() {
     fun setGameRules(borders: Boolean, reverse: Boolean) {
         isBordersMode = borders
         isReverseMode = reverse
+    }
+
+    // Inicializa el log
+    fun initLog(alias: String, isTimeEnabled: Boolean) {
+        logHeader.clear()
+        logHeader.add("Jugador: $alias")
+        if (isTimeEnabled)  logHeader.add("Control del tiempo")
+        if (isBordersMode) logHeader.add("Modo fronteras")
+        if (isReverseMode) logHeader.add("Modo inverso")
     }
 
     // Registra una jugada en el log

@@ -1,6 +1,7 @@
 package com.example.tripletriad.ui.screens
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
@@ -60,166 +62,208 @@ fun ConfiguracionScreen(
     onStartGame: (String, Boolean, Boolean, Boolean) -> Unit,
     viewModel: ConfigurationViewModel = viewModel()) {
 
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { delay(AnimationConfig.INITIAL_START_DELAY); visible = true }
 
     Box(modifier = Modifier.fillMaxSize()) {
         MenuBackground()
 
+        if (isLandscape) {
+            // LANDSCAPE: dos columnas para aprovechar el ancho
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Columna izquierda: cabecera + alias
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    ConfigHeader(visible)
+                    ConfigAlias(visible, viewModel)
+                }
+                // Columna derecha: opciones + botón
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    ConfigOptions(visible, viewModel)
+                    ConfigStart(visible, viewModel, onStartGame)
+                }
+            }
+        } else {
+            // PORTRAIT: una sola columna (como estaba)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(Modifier.height(40.dp))
+                ConfigHeader(visible)
+                Spacer(Modifier.height(32.dp))
+                ConfigAlias(visible, viewModel)
+                Spacer(Modifier.height(16.dp))
+                ConfigOptions(visible, viewModel)
+                Spacer(Modifier.height(32.dp))
+                ConfigStart(visible, viewModel, onStartGame)
+                Spacer(Modifier.height(32.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun ConfigHeader(visible: Boolean) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL)) + slideInVertically(tween(AnimationConfig.DURATION_NORMAL, easing = EaseOutCubic)) { -60 }
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            HorizontalDividerWithDiamonds()
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.config_title),
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 8.sp,
+                color = TtTextPrimary
+            )
+            Text(
+                text = stringResource(R.string.config_subtitle),
+                fontSize = 10.sp,
+                letterSpacing = 3.sp,
+                color = TtGold
+            )
+            Spacer(Modifier.height(16.dp))
+            HorizontalDividerWithDiamonds()
+        }
+    }
+}
+
+@Composable
+fun ConfigAlias(visible: Boolean, viewModel: ConfigurationViewModel) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_SHORT)) + slideInHorizontally(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_SHORT)) { -40 }
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .border(
+                    width = if (viewModel.isAliasError) 1.5.dp else 1.dp,
+                    color = if (viewModel.isAliasError) TtOpponentRed else TtBorder,
+                    shape = RoundedCornerShape(6.dp)
+                )
+                .background(TtBgSurface.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Spacer(Modifier.height(40.dp))
-
-            // Cabecera
-            AnimatedVisibility(
-                visible = visible,
-                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL)) + slideInVertically(tween(AnimationConfig.DURATION_NORMAL, easing = EaseOutCubic)) { -60 }
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    HorizontalDividerWithDiamonds()
-                    Spacer(Modifier.height(16.dp))
-                    Text(
-                        text = stringResource(R.string.config_title),
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 8.sp,
-                        color = TtTextPrimary
-                    )
-                    Text(
-                        text = stringResource(R.string.config_subtitle),
-                        fontSize = 10.sp,
-                        letterSpacing = 3.sp,
-                        color = TtGold
-                    )
-                    Spacer(Modifier.height(16.dp))
-                    HorizontalDividerWithDiamonds()
-                }
-            }
-
-            Spacer(Modifier.height(32.dp))
-
-            // Alias
-            AnimatedVisibility(
-                visible = visible,
-                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_SHORT)) + slideInHorizontally(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_SHORT)) { -40 }
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(
-                            width = if (viewModel.isAliasError) 1.5.dp else 1.dp,
-                            color = if (viewModel.isAliasError) TtOpponentRed else TtBorder,
-                            shape = RoundedCornerShape(6.dp)
-                        )
-                        .background(TtBgSurface.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.config_alias_label).uppercase(),
-                        fontSize = 9.sp,
-                        letterSpacing = 3.sp,
-                        color = TtGold,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    OutlinedTextField(
-                        value = viewModel.alias,
-                        onValueChange = {
-                            viewModel.updateAlias(it)
-                        },
-                        placeholder = { Text("ex: Jugador", color = TtTextDim, fontSize = 14.sp) },
-                        singleLine = true,
-                        isError = viewModel.isAliasError,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor       = TtBluePrimary,
-                            unfocusedBorderColor     = TtBorder,
-                            errorBorderColor         = TtOpponentRed,
-                            focusedTextColor         = TtTextPrimary,
-                            unfocusedTextColor       = TtTextPrimary,
-                            cursorColor              = TtBlueLight,
-                            focusedContainerColor    = TtBgCard,
-                            unfocusedContainerColor  = TtBgCard,
-                            errorContainerColor      = TtOpponentRed.copy(alpha = 0.05f)
-                        )
-                    )
-                    AnimatedVisibility(visible = viewModel.isAliasError) {
-                        Text(
-                            text = stringResource(R.string.config_alias_error),
-                            fontSize = 11.sp,
-                            color = TtOpponentRed,
-                            letterSpacing = 1.sp
-                        )
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // Opciones de juego
-            AnimatedVisibility(
-                visible = visible,
-                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM)) + slideInVertically(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM)) { 40 }
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, TtBorder, RoundedCornerShape(6.dp))
-                        .background(TtBgSurface.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
-                        .padding(4.dp)
-                ) {
-                    ConfigOptionRow(
-                        title       = stringResource(R.string.config_time_title),
-                        subtitle    = stringResource(R.string.config_time_sub),
-                        icon        = "⏱",
-                        checked     = viewModel.isTimeEnabled,
-                        onCheckedChange = { viewModel.updateTimeEnabled(it) },
-                        showDivider = true
-                    )
-                    ConfigOptionRow(
-                        title       = stringResource(R.string.config_borders_title),
-                        subtitle    = stringResource(R.string.config_borders_sub),
-                        icon        = "⊕",
-                        checked     = viewModel.isBordersMode,
-                        onCheckedChange = { viewModel.updateBordersMode(it) },
-                        showDivider = true
-                    )
-                    ConfigOptionRow(
-                        title       = stringResource(R.string.config_reverse_title),
-                        subtitle    = stringResource(R.string.config_reverse_sub),
-                        icon        = "↕",
-                        checked     = viewModel.isReverseMode,
-                        onCheckedChange = { viewModel.updateReverseMode(it) },
-                        showDivider = false
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(32.dp))
-
-            // Botón para empezar partida
-            AnimatedVisibility(
-                visible = visible,
-                enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_LONG)) + slideInVertically(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_LONG)) { 60 }
-            ) {
-                StartButton(
-                    onClick = {
-                        if (viewModel.isConfigValid()) {
-                            viewModel.savePreferences()
-
-                            onStartGame(viewModel.alias, viewModel.isTimeEnabled, viewModel.isBordersMode, viewModel.isReverseMode)
-                        }
-                    }
+            Text(
+                text = stringResource(R.string.config_alias_label).uppercase(),
+                fontSize = 9.sp,
+                letterSpacing = 3.sp,
+                color = TtGold,
+                fontWeight = FontWeight.SemiBold
+            )
+            OutlinedTextField(
+                value = viewModel.alias,
+                onValueChange = { viewModel.updateAlias(it) },
+                placeholder = { Text("ex: Jugador", color = TtTextDim, fontSize = 14.sp) },
+                singleLine = true,
+                isError = viewModel.isAliasError,
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor       = TtBluePrimary,
+                    unfocusedBorderColor     = TtBorder,
+                    errorBorderColor         = TtOpponentRed,
+                    focusedTextColor         = TtTextPrimary,
+                    unfocusedTextColor       = TtTextPrimary,
+                    cursorColor              = TtBlueLight,
+                    focusedContainerColor    = TtBgCard,
+                    unfocusedContainerColor  = TtBgCard,
+                    errorContainerColor      = TtOpponentRed.copy(alpha = 0.05f)
+                )
+            )
+            AnimatedVisibility(visible = viewModel.isAliasError) {
+                Text(
+                    text = stringResource(R.string.config_alias_error),
+                    fontSize = 11.sp,
+                    color = TtOpponentRed,
+                    letterSpacing = 1.sp
                 )
             }
-
-            Spacer(Modifier.height(32.dp))
         }
+    }
+}
+
+@Composable
+fun ConfigOptions(visible: Boolean, viewModel: ConfigurationViewModel) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM)) + slideInVertically(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_MEDIUM)) { 40 }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.dp, TtBorder, RoundedCornerShape(6.dp))
+                .background(TtBgSurface.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
+                .padding(4.dp)
+        ) {
+            ConfigOptionRow(
+                title       = stringResource(R.string.config_time_title),
+                subtitle    = stringResource(R.string.config_time_sub),
+                icon        = "⏱",
+                checked     = viewModel.isTimeEnabled,
+                onCheckedChange = { viewModel.updateTimeEnabled(it) },
+                showDivider = true
+            )
+            ConfigOptionRow(
+                title       = stringResource(R.string.config_borders_title),
+                subtitle    = stringResource(R.string.config_borders_sub),
+                icon        = "⊕",
+                checked     = viewModel.isBordersMode,
+                onCheckedChange = { viewModel.updateBordersMode(it) },
+                showDivider = true
+            )
+            ConfigOptionRow(
+                title       = stringResource(R.string.config_reverse_title),
+                subtitle    = stringResource(R.string.config_reverse_sub),
+                icon        = "↕",
+                checked     = viewModel.isReverseMode,
+                onCheckedChange = { viewModel.updateReverseMode(it) },
+                showDivider = false
+            )
+        }
+    }
+}
+
+@Composable
+fun ConfigStart(
+    visible: Boolean,
+    viewModel: ConfigurationViewModel,
+    onStartGame: (String, Boolean, Boolean, Boolean) -> Unit
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_LONG)) + slideInVertically(tween(AnimationConfig.DURATION_NORMAL, AnimationConfig.DELAY_LONG)) { 60 }
+    ) {
+        StartButton(
+            onClick = {
+                if (viewModel.isConfigValid()) {
+                    viewModel.savePreferences()
+                    onStartGame(viewModel.alias, viewModel.isTimeEnabled, viewModel.isBordersMode, viewModel.isReverseMode)
+                }
+            }
+        )
     }
 }
 

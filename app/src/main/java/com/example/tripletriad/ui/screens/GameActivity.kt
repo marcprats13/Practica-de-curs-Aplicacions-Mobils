@@ -54,6 +54,8 @@ class GameActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
 
                     gameViewModel.setGameRules(isBordersMode, isReverseMode)
+                    gameViewModel.initLog(playerName, isTimeEnabled)
+
                     if (isTimeEnabled) gameViewModel.startTimer(GameSettings.DEFAULT_TIME_SECONDS)
                 }
                 Surface(
@@ -384,19 +386,27 @@ fun GameLogPane(viewModel: GameViewModel) {
     ) {
         Text(
             text = stringResource(R.string.game_log),
-            fontSize = 11.sp,
+            fontSize = 10.sp,
             letterSpacing = 3.sp,
             fontWeight = FontWeight.SemiBold,
             color = TtGold
         )
-        Spacer(Modifier.height(8.dp))
+        if (viewModel.logHeader.isNotEmpty()) {
+            Text(
+                text = viewModel.logHeader.joinToString("  -  "),
+                fontSize = 10.sp,
+                color = TtTextSecondary
+            )
+        }
+
+        Spacer(Modifier.height(6.dp))
         HorizontalDivider(color = TtBorder)
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(6.dp))
 
         if (viewModel.gameLog.isEmpty()) {
             Text(
                 text = stringResource(R.string.game_no_play),
-                fontSize = 12.sp,
+                fontSize = 10.sp,
                 color = TtTextSecondary
             )
         } else {
@@ -408,7 +418,7 @@ fun GameLogPane(viewModel: GameViewModel) {
                 viewModel.gameLog.forEachIndexed { index, entrada ->
                     Text(
                         text = "${index + 1}. $entrada",
-                        fontSize = 12.sp,
+                        fontSize = 10.sp,
                         color = TtTextPrimary
                     )
                 }
